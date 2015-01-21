@@ -6,10 +6,13 @@ public class Figure {
 	public FigPose pose;
 	public FigStructure struct;
 	List<FigAnimation> animations;
+	String filename;
 
 	FigAnimation current_anim;
 
-	public Figure(FigStructure fs) {}
+	public Figure(FigStructure fs) {
+		
+	}
 
 	public void update(double s) {
 		current_anim.update(s);
@@ -21,6 +24,6 @@ public class Figure {
 	}
 
 	public static Figure fromFile(String filename) {
-
+		String
 	}
 }
