@@ -1,4 +1,3 @@
-
 package figures;
 
 import java.util.List;
@@ -9,10 +8,8 @@ public class Figure {
 	List<FigAnimation> animations;
 
 	FigAnimation current_anim;
-	
-	public Figure(FigStructure fs) {
-		asdf.
-	}
+
+	public Figure(FigStructure fs) {}
 
 	public void update(double s) {
 		current_anim.update(s);
@@ -23,10 +20,6 @@ public class Figure {
 		this.current_anim = a;
 	}
 
-	public String() {
-
-	}
-	
 	public static Figure fromFile(String filename) {
 
 	}
