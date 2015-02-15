@@ -1,6 +1,10 @@
+
 package figures;
 
+import java.io.File;
 import java.util.List;
+
+import utils.Methods;
 
 public class Figure {
 	public FigPose pose;
@@ -11,7 +15,7 @@ public class Figure {
 	FigAnimation current_anim;
 
 	public Figure(FigStructure fs) {
-		
+		this.struct = fs;
 	}
 
 	public void update(double s) {
@@ -24,6 +28,9 @@ public class Figure {
 	}
 
 	public static Figure fromFile(String filename) {
-		String
+		String[] lines = Methods.getFileContents(new File(filename)).split("\n");
+
+		FigStructure struct = FigStructure.unpack(lines[0]);
+		return new Figure(struct);
 	}
 }
