@@ -1,4 +1,3 @@
-
 package game;
 
 import java.awt.Color;
@@ -20,7 +19,8 @@ import framework.forms.Player;
 
 public class Game extends JPanel implements KeyListener, Runnable {
 	// public static Dimension SCREEN = new Dimension(700,400);
-	public static Dimension SCREEN = Toolkit.getDefaultToolkit().getScreenSize();
+	public static Dimension SCREEN = Toolkit.getDefaultToolkit()
+			.getScreenSize();
 
 	private static final long serialVersionUID = 4092070700879219267L;
 
@@ -31,7 +31,8 @@ public class Game extends JPanel implements KeyListener, Runnable {
 	public HashSet<Integer> keys = new HashSet<Integer>();
 
 	private int fps, minFPS, updateFPS;
-	private long lastTime = System.currentTimeMillis(), ltUpdate = System.currentTimeMillis();
+	private long lastTime = System.currentTimeMillis(), ltUpdate = System
+			.currentTimeMillis();
 
 	public Game() {
 		world = new World();
@@ -55,7 +56,7 @@ public class Game extends JPanel implements KeyListener, Runnable {
 
 	public void run() {
 		int counter = 0;
-	
+
 		while (true) {
 			counter++;
 
@@ -142,5 +143,4 @@ public class Game extends JPanel implements KeyListener, Runnable {
 
 		frame.setVisible(true);
 	}
-
 }
