@@ -93,7 +93,7 @@ public class Game extends JPanel implements KeyListener, Runnable {
 	}
 
 	public void paintComponent(Graphics grr) {
-		// super.paintComponent(grr);
+//		 super.paintComponent(grr);
 
 		long t = System.currentTimeMillis();
 
