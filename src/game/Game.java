@@ -14,6 +14,7 @@ import javax.swing.JPanel;
 
 import utils.Methods;
 import chem.Atom;
+import chem.AtomEntity;
 import framework.Eye;
 import framework.forms.Player;
 
@@ -40,7 +41,7 @@ public class Game extends JPanel implements KeyListener, Runnable {
 		view = new Eye(world.current, SCREEN);
 		player = new Player(world.current);
 
-		new Atom(world.current, 44);
+		new AtomEntity(world.current, new Atom(20));
 		// Atom b = new Atom(world.current, 32);
 		// Atom c = new Atom(world.current, 31);
 
