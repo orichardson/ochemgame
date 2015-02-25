@@ -68,7 +68,7 @@ public class Game extends JPanel implements KeyListener, Runnable {
 			if (counter % 100 == 0)
 				minFPS = fps;
 
-			double diff = 0.0009;
+			double diff = 0.0015;
 
 			if (keys.contains(KeyEvent.VK_E))
 				view.da += diff / factor;
@@ -82,7 +82,6 @@ public class Game extends JPanel implements KeyListener, Runnable {
 			world.update(this, factor);
 
 			view.focusApproach(player.pos, factor);
-			view.update(this, factor);
 
 			repaint();
 
