@@ -25,6 +25,11 @@ public class AtomGroup {
 	 *  Molecule h3po4 = Molecule.create("H3PO4");
 	 */
 	
+	/**
+	 * Smiles
+	 * @param str
+	 * @return
+	 */
 	public static AtomGroup create(String str) {
 		//H3PO --> 
 	}

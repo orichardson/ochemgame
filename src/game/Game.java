@@ -1,3 +1,4 @@
+
 package game;
 
 import java.awt.Color;
@@ -14,14 +15,12 @@ import javax.swing.JPanel;
 
 import utils.Methods;
 import chem.Atom;
-import chem.AtomEntity;
 import framework.Eye;
 import framework.forms.Player;
 
 public class Game extends JPanel implements KeyListener, Runnable {
 	// public static Dimension SCREEN = new Dimension(700,400);
-	public static Dimension SCREEN = Toolkit.getDefaultToolkit()
-			.getScreenSize();
+	public static Dimension SCREEN = Toolkit.getDefaultToolkit().getScreenSize();
 
 	private static final long serialVersionUID = 4092070700879219267L;
 
@@ -32,8 +31,7 @@ public class Game extends JPanel implements KeyListener, Runnable {
 	public HashSet<Integer> keys = new HashSet<Integer>();
 
 	private int fps, minFPS, updateFPS;
-	private long lastTime = System.currentTimeMillis(), ltUpdate = System
-			.currentTimeMillis();
+	private long lastTime = System.currentTimeMillis(), ltUpdate = System.currentTimeMillis();
 
 	public Game() {
 		world = new World();
@@ -41,7 +39,7 @@ public class Game extends JPanel implements KeyListener, Runnable {
 		view = new Eye(world.current, SCREEN);
 		player = new Player(world.current);
 
-		new AtomEntity(world.current, new Atom(20));
+		new Atom(world.current, 20);
 		// Atom b = new Atom(world.current, 32);
 		// Atom c = new Atom(world.current, 31);
 
@@ -93,7 +91,7 @@ public class Game extends JPanel implements KeyListener, Runnable {
 	}
 
 	public void paintComponent(Graphics grr) {
-//		 super.paintComponent(grr);
+		// super.paintComponent(grr);
 
 		long t = System.currentTimeMillis();
 
