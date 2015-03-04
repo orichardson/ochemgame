@@ -27,7 +27,6 @@ public class Eye extends SceneNode {
 	Vector3D pos_synced;
 
 	// **** Non-synchronized variables
-
 	public double ortho = 0; // between 0 and 1;
 
 	public Vector3D focus = new Vector3D();

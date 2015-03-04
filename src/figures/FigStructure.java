@@ -20,6 +20,8 @@ public class FigStructure {
 	public Color[] colors;
 
 	public FigPose defaultPose;
+	
+	String fileName;
 
 	// empty private constructor (want to create via static factory methods)
 	private FigStructure() {}

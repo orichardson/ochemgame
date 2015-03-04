@@ -7,6 +7,8 @@ import java.util.List;
 import utils.Methods;
 
 public class Figure {
+	String fileName;
+
 	public FigPose pose;
 	public FigStructure struct;
 	List<FigAnimation> animations;
@@ -31,6 +33,15 @@ public class Figure {
 		String structstr = Methods.getFileContents(new File("Resources/Structures/" + npts
 				+ "PTFIG.struct"));
 		return new Figure(FigStructure.unpack(structstr));
+	}
+
+	public Figure setFile(String name) {
+		this.fileName = name;
+		return this;
+	}
+
+	public void saveToFile() {
+
 	}
 
 	public static Figure fromFile(String filename) {
