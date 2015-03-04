@@ -11,6 +11,10 @@ import framework.forms.Form;
 import framework.forms.Particle;
 import framework.forms.ParticleGraphEntity;
 
+/*
+ * NOTES: 
+ * (1) Atoms have references to their parent groups through the scene graph. 
+ */
 public class Atom extends ParticleGraphEntity {
 	public static final Data[] PROPERTIES;
 
