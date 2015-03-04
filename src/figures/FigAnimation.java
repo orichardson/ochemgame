@@ -12,7 +12,7 @@ public class FigAnimation {
 	double currentIndex;
 	private FigPose currentPose;
 
-	ArrayList<FigPose> poses = new ArrayList<FigPose>();
+	public ArrayList<FigPose> poses = new ArrayList<FigPose>();
 	ArrayList<Double> times = new ArrayList<Double>();
 
 	public FigPose getPose() {

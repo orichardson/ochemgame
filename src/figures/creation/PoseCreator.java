@@ -29,11 +29,11 @@ public class PoseCreator extends JPanel implements MouseListener, MouseMotionLis
 	private static final long serialVersionUID = -8293452421327152836L;
 
 	// ************* Variables ***************
-	Figure figure = new Figure("Resources/Structures/15PTFIG.struct");
+	Figure figure = Figure.createEmptyFigure(15);
 	Vector3D temp = new Vector3D();
 	ArrayList<FigPose> poses = new ArrayList<FigPose>();
 
-	FigAnimation anim = new FigAnimation(figure);
+	FigAnimation anim = new FigAnimation();
 
 	Eye eye = new Eye(null, new Dimension(1100, 800));
 
@@ -77,7 +77,7 @@ public class PoseCreator extends JPanel implements MouseListener, MouseMotionLis
 
 		this.keys = k;
 
-		poses.add(figure.form.defaultPose.clone());
+		poses.add(figure.struct.defaultPose.clone());
 	}
 
 	public void paintComponent(Graphics gr) {
@@ -87,11 +87,12 @@ public class PoseCreator extends JPanel implements MouseListener, MouseMotionLis
 
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-		Vector2D piece1 = eye.toScreen(new Vector3D(1, -1, 0));
-		Vector2D piece2 = eye.toScreen(new Vector3D(-1, 1, 0));
-		Vector2D piece3 = eye.toScreen(new Vector3D(-1, -1, 2));
-		Vector2D base = eye.toScreen(new Vector3D(-1, -1, 0));
-		Vector2D origin = eye.toScreen(new Vector3D(0, 0, 0));
+		//******************************************* DRAW AXES *******************************
+		Vector3D piece1 = eye.toScreen(new Vector3D(1, -1, 0));
+		Vector3D piece2 = eye.toScreen(new Vector3D(-1, 1, 0));
+		Vector3D piece3 = eye.toScreen(new Vector3D(-1, -1, 2));
+		Vector3D base = eye.toScreen(new Vector3D(-1, -1, 0));
+		Vector3D origin = eye.toScreen(new Vector3D(0, 0, 0));
 
 		if (piece1 != null && base != null) {
 			g.setStroke(new BasicStroke(lockX ? 10 : 4));
@@ -120,13 +121,14 @@ public class PoseCreator extends JPanel implements MouseListener, MouseMotionLis
 
 		g.setStroke(new BasicStroke(1));
 
+		//*************************************** DRAW MOTION BLUR *******************************
 		if (!running) {
 			for (int h = 1; h < 5; h++) {
-				GeneralFigure.Pose prevPose = poses.get( (h * poses.size() + current - h)
+				FigPose prevPose = poses.get( (h * poses.size() + current - h)
 						% poses.size());
 
-				for (int i = 0; i < figure.form.nPoints; i++) {
-					Vector2D v = eye.toScreen(prevPose.positions[i]);
+				for (int i = 0; i < figure.struct.NPTS; i++) {
+					Vector3D v = eye.toScreen(prevPose.pos[i]);
 					if (v == null) {
 						xpoints[i] = -1;
 						ypoints[i] = -1;
@@ -136,26 +138,26 @@ public class PoseCreator extends JPanel implements MouseListener, MouseMotionLis
 					ypoints[i] = eye.psY(v.y);
 				}
 
-				for (int i = 0; i < figure.form.lengths.length; i++) {
-					if (xpoints[figure.form.end1[i]] != -1) {
-						if (selected.contains(figure.form.end1[i])
-								&& selected.contains(figure.form.end2[i]))
+				for (int i = 0; i < figure.struct.lengths.length; i++) {
+					if (xpoints[figure.struct.line1[i]] != -1) {
+						if (selected.contains(figure.struct.line1[i])
+								&& selected.contains(figure.struct.line2[i]))
 							g.setColor(Methods.colorMeld(new Color(140, 70, 70), new Color(0, 0, 0,
 									0), h / 5D));
 						else
 							g.setColor(Methods.colorMeld(new Color(70, 70, 140), new Color(0, 0, 0,
 									0), h / 5D));
-						g.drawLine(xpoints[figure.form.end1[i]], ypoints[figure.form.end1[i]],
-								xpoints[figure.form.end2[i]], ypoints[figure.form.end2[i]]);
+						g.drawLine(xpoints[figure.struct.line1[i]], ypoints[figure.struct.line1[i]],
+								xpoints[figure.struct.line2[i]], ypoints[figure.struct.line2[i]]);
 					}
 				}
 
-				int w = eye.sphereWidth(prevPose.positions[figure.form.head], figure.form.headSize);
-				if (xpoints[figure.form.head] != -1)
-					g.drawOval(xpoints[figure.form.head] - w, ypoints[figure.form.head] - w, 2 * w,
+				int w = eye.sphereWidth(prevPose.pos[figure.struct.head], figure.struct.headSize);
+				if (xpoints[figure.struct.head] != -1)
+					g.drawOval(xpoints[figure.struct.head] - w, ypoints[figure.struct.head] - w, 2 * w,
 							2 * w);
 
-				for (int i = 0; i < prevPose.positions.length; i++) {
+				for (int i = 0; i < prevPose.pos.length; i++) {
 					int r = running ? 1 : 8;
 					if (xpoints[i] != -1) {
 						if (selected.contains(i) && selected.contains(i))
@@ -170,13 +172,13 @@ public class PoseCreator extends JPanel implements MouseListener, MouseMotionLis
 			}
 		}
 
-		GeneralFigure.Pose toDraw = (running ? figure.pose : poses.get(current));
+		FigPose toDraw = (running ? figure.pose : poses.get(current));
 
-		double[] distances = new double[figure.form.nPoints];
+		double[] distances = new double[figure.struct.NPTS];
 		double minDist = Double.MAX_VALUE, maxDist = Double.MIN_VALUE;
 
-		for (int i = 0; i < figure.form.nPoints; i++) {
-			Vector2D v = eye.toScreen(toDraw.positions[i]);
+		for (int i = 0; i < figure.struct.NPTS; i++) {
+			Vector3D v = eye.toScreen(toDraw.pos[i]);
 			if (v == null) {
 				xpoints[i] = -1;
 				ypoints[i] = -1;
@@ -184,7 +186,7 @@ public class PoseCreator extends JPanel implements MouseListener, MouseMotionLis
 			}
 			xpoints[i] = eye.psX(v.x);
 			ypoints[i] = eye.psY(v.y);
-			distances[i] = eye.faceDist(toDraw.positions[i]);
+			distances[i] = eye.faceDist(toDraw.pos[i]);
 
 			if (distances[i] > maxDist)
 				maxDist = distances[i];
@@ -193,29 +195,29 @@ public class PoseCreator extends JPanel implements MouseListener, MouseMotionLis
 		}
 		g.setColor(Color.gray);
 
-		for (int i = 0; i < figure.form.lengths.length; i++) {
-			if (xpoints[figure.form.end1[i]] != -1) {
-				if (selected.contains(figure.form.end1[i])
-						&& selected.contains(figure.form.end2[i]))
+		for (int i = 0; i < figure.struct.lengths.length; i++) {
+			if (xpoints[figure.struct.line1[i]] != -1) {
+				if (selected.contains(figure.struct.line1[i])
+						&& selected.contains(figure.struct.line2[i]))
 					g.setColor(new Color(255, 150, 0));
 				else
 					g.setColor(Color.gray);
 
-				g.drawLine(xpoints[figure.form.end1[i]], ypoints[figure.form.end1[i]],
-						xpoints[figure.form.end2[i]], ypoints[figure.form.end2[i]]);
+				g.drawLine(xpoints[figure.struct.line1[i]], ypoints[figure.struct.line1[i]],
+						xpoints[figure.struct.line2[i]], ypoints[figure.struct.line2[i]]);
 			}
 		}
 
-		if (selected.contains(figure.form.head))
+		if (selected.contains(figure.struct.head))
 			g.setColor(new Color(255, 150, 0));
 		else
 			g.setColor(Color.gray);
 
-		int w = eye.sphereWidth(figure.pose.positions[figure.form.head], figure.form.headSize);
-		if (xpoints[figure.form.head] != -1)
-			g.drawOval(xpoints[figure.form.head] - w, ypoints[figure.form.head] - w, 2 * w, 2 * w);
+		int w = eye.sphereWidth(figure.pose.pos[figure.struct.head], figure.struct.headSize);
+		if (xpoints[figure.struct.head] != -1)
+			g.drawOval(xpoints[figure.struct.head] - w, ypoints[figure.struct.head] - w, 2 * w, 2 * w);
 
-		for (int i = 0; i < toDraw.positions.length; i++) {
+		for (int i = 0; i < toDraw.pos.length; i++) {
 			int r = running ? 1 : 8;
 			if (xpoints[i] != -1) {
 				g.setColor(selected.contains(i) ? new Color(255, 150, 0, 100) : //
@@ -259,7 +261,7 @@ public class PoseCreator extends JPanel implements MouseListener, MouseMotionLis
 		} else if (key == KeyEvent.VK_A) {
 			moveMode = -1;
 			boolean fullSelection = true;
-			for (int i = 0; i < figure.form.nPoints; i++)
+			for (int i = 0; i < figure.struct.NPTS; i++)
 				if (!selected.contains(i)) {
 					selected.add(i);
 					fullSelection = false;
@@ -289,37 +291,37 @@ public class PoseCreator extends JPanel implements MouseListener, MouseMotionLis
 			boolean locked = ! (lockX || lockY || lockZ);
 			if (moveMode == 0) {
 				for (int select : selected) {
-					double d = eye.faceDist(frozen.positions[select]);
+					double d = eye.faceDist(frozen.pos[select]);
 					Vector3D v = eye.pickDist(evt.getX(), evt.getY(), d)
 							.sub(eye.pickDist(actualizeX, actualizeY, d))
-							.add(frozen.positions[select]);
-					poses.get(current).positions[select].set(v, locked || lockX, locked || lockY,
+							.add(frozen.pos[select]);
+					poses.get(current).pos[select].set(v, locked || lockX, locked || lockY,
 							locked || lockZ);
 					calculateMidpoint();
 				}
 			} else if (moveMode == 1) {
 				for (int select : selected) {
-					double d = eye.faceDist(frozen.positions[select]);
+					double d = eye.faceDist(frozen.pos[select]);
 					double factor = eye.pickDist(evt.getX(), evt.getY(), d).sub(midpoint)
 							.magnitude()
 							/ eye.pickDist(actualizeX, actualizeY, d).sub(midpoint).magnitude();
-					Vector3D v = (frozen.positions[select].clone().sub(midpoint)).scale(factor)
+					Vector3D v = (frozen.pos[select].clone().sub(midpoint)).scale(factor)
 							.add(midpoint);
-					poses.get(current).positions[select].set(v, locked || lockX, locked || lockY,
+					poses.get(current).pos[select].set(v, locked || lockX, locked || lockY,
 							locked || lockZ);
 				}
 			} else if (moveMode == 2) {
 				for (int select : selected) {
-					// double d = eye.faceDist(frozen.positions[select]);
-					Vector2D screenmp = eye.toScreen(midpoint);
+					// double d = eye.faceDist(frozen.pos[select]);
+					Vector3D screenmp = eye.toScreen(midpoint);
 					double angle = Math.atan2(evt.getY() - eye.psY(screenmp.y),
 							evt.getX() - eye.psX(screenmp.x))
 							- Math.atan2(actualizeY - eye.psY(screenmp.y),
 									actualizeX - eye.psX(screenmp.x));
 					Vector3D v = Matrix
 							.createArbitraryRotationMatrix(angle, eye.calculateDirection())
-							.applyTo(frozen.positions[select].clone().sub(midpoint)).add(midpoint);
-					poses.get(current).positions[select].set(v, locked || lockX, locked || lockY,
+							.applyTo(frozen.pos[select].clone().sub(midpoint)).add(midpoint);
+					poses.get(current).pos[select].set(v, locked || lockX, locked || lockY,
 							locked || lockZ);
 				}
 			}
@@ -415,7 +417,7 @@ public class PoseCreator extends JPanel implements MouseListener, MouseMotionLis
 		Vector3D tot = new Vector3D();
 
 		for (int i : selected)
-			tot.add(poses.get(current).positions[i]);
+			tot.add(poses.get(current).pos[i]);
 
 		midpoint = tot.scale(1D / selected.size());
 	}

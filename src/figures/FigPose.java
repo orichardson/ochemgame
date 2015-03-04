@@ -6,7 +6,7 @@ import math.Vector3D;
 public class FigPose {
 	int FIG_PTS;
 
-	Vector3D[] pos;
+	public Vector3D[] pos;
 
 	private FigPose(int n) {
 		FIG_PTS = n;

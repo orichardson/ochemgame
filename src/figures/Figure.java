@@ -27,6 +27,12 @@ public class Figure {
 		this.current_anim = a;
 	}
 
+	public static Figure createEmptyFigure(int npts) {
+		String structstr = Methods.getFileContents(new File("Resources/Structures/" + npts
+				+ "PTFIG.struct"));
+		return new Figure(FigStructure.unpack(structstr));
+	}
+
 	public static Figure fromFile(String filename) {
 		String[] lines = Methods.getFileContents(new File(filename)).split("\n");
 
