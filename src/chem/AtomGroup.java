@@ -18,15 +18,22 @@ public class AtomGroup {
 	 *   (steric/torsional need to be calculated in pairs)
 	 *  
 	 *  ************ Desired Usage ************************
-	 *  Molecule pentane = Molecule.createXane(5); // macro for Molecule.create("CH3CH2CH2CH2CH3");
+	 *  AtomGroup pentane = AtomGroup.createXane(5); // macro for Molecule.create("CH3CH2CH2CH2CH3");
 	 *  pentane.idealConfig(); // align properly w.r.t. bond length, angles
 	 *  pentane.forceGroup("?-OH", 0); // make alcohol
 	 *  
-	 *  Molecule h3po4 = Molecule.create("H3PO4");
+	 *  AtomGroup h3po4 = AtomGroup.create("H3PO4");
+	 *  
+	 *  
 	 */
 	
-	public static AtomGroup create(String str) {
-		//H3PO --> 
+	//TODO Fill in these methods
+	public static AtomGroup create(String str) {}
+	public void idealConfig(){}
+	public void forceGroup(AtomGroup m, int n) {}
+	
+	public void forceGroup(String str, int n) {
+		forceGroup(create(str), n);
 	}
 	
 	ArrayList<Atom> atoms = new ArrayList<Atom>(); // have associated indices
