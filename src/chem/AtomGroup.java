@@ -13,7 +13,7 @@ public class AtomGroup {
 	 *  -- Compute electrophilicity and nucleophilicity of each atom, 
 	 *  		-- also, direction of attack.
 	 *  -- Calculate charge distributions
-	 *  STRAIN:
+	 *  STRAIN: 
 	 *  -- Calculate angle strain on each atom
 	 *   (steric/torsional need to be calculated in pairs)
 	 *  
@@ -29,10 +29,13 @@ public class AtomGroup {
 	
 
 	//TODO Fill in these methods
-	public static AtomGroup create(String str) {}
 	public void idealConfig(){}
 	public void forceGroup(AtomGroup m, int n) {}
+	public String toString() {
+		return SMILES.linearize(this);
+	}
 	
+	//OVERLOADED VERSIONS follow...	
 	public void forceGroup(String str, int n) {
 		forceGroup(create(str), n);
 	}
