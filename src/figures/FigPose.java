@@ -46,11 +46,13 @@ public class FigPose {
 	}
 
 	public static FigPose unpack(String str) {
-		String[] split = str.split("\t");
+		String[] split = str.split("\\|");
 		FigPose pose = new FigPose(split.length);
 
-		for (int i = 0; i < split.length; i++)
+		for (int i = 0; i < split.length; i++) {
+			System.out.println(split[i]);
 			pose.pos[i] = Vector3D.unpack(split[i]);
+		}
 
 		return pose;
 	}
@@ -58,7 +60,7 @@ public class FigPose {
 	public static String pack(Vector3D[] things) {
 		StringBuilder sb = new StringBuilder();
 		for (Vector3D i : things)
-			sb.append(i.pack() + "\t");
+			sb.append(i.pack() + " | ");
 		sb.deleteCharAt(sb.length() - 1);
 		return sb.toString();
 	}

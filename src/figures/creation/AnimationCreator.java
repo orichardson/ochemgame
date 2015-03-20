@@ -27,7 +27,7 @@ import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import figures.FigAnimation;
+import figures.Figure;
 
 public class AnimationCreator extends JPanel implements ActionListener, ChangeListener, Runnable, KeyListener {
 	private static final long serialVersionUID = 3997801619703816644L;
@@ -71,7 +71,6 @@ public class AnimationCreator extends JPanel implements ActionListener, ChangeLi
 
 	JButton help = new JButton("Help");
 
-	//
 	JButton changeStruct = new JButton("Change Structure");
 
 	// UTILITIES:
@@ -79,7 +78,6 @@ public class AnimationCreator extends JPanel implements ActionListener, ChangeLi
 	AnimTimePanel timeline;
 	PoseCreator ps;
 
-	FigAnimation animation;
 
 	public AnimationCreator() throws IllegalArgumentException, IllegalAccessException {
 		ps = new PoseCreator(keys);
@@ -166,7 +164,6 @@ public class AnimationCreator extends JPanel implements ActionListener, ChangeLi
 		p3.add(orthographic);
 		p3.add(followSelection);
 
-		this.animation = ps.anim;
 		timeline = new AnimTimePanel(ps, this);
 
 		JPanel frametools = new JPanel(new GridLayout(2, 1));
@@ -204,48 +201,52 @@ public class AnimationCreator extends JPanel implements ActionListener, ChangeLi
 		} else if (evt.getSource() == load) {
 			JFileChooser chooser = new JFileChooser();
 			chooser.setCurrentDirectory(new File(System.getProperty("user.dir"), "Resources"));
+			
 			chooser.setFileFilter(new javax.swing.filechooser.FileFilter() {
 				public boolean accept(File f) {
-					return (f.getName().endsWith(".anim") || f.isDirectory());
+					return (f.getName().endsWith(".fig") || f.isDirectory());
 				}
 
 				public String getDescription() {
-					return "Animation (.anim)";
+					return "Figure (.fig)";
 				}
 			});
+			
 			int r = chooser.showOpenDialog(this);
 			if (r == JFileChooser.APPROVE_OPTION) {
-				FigAnimation ga = new FigAnimation(chooser.getSelectedFile().getAbsolutePath(), ps.figure);
-				this.animation = ga;
-				ps.anim = ga;
-				ps.poses = ga.poses;
-				ps.figure.animation = ga;
+				Figure newFig = Figure.fromFile(chooser.getSelectedFile().getAbsolutePath());
+//				ps.anim = ga;
+//				ps.poses = ga.poses;
+//				ps.figure.current_anim = ga;
 
 				ps.current = 0;
 				ps.selected.clear();
-				ps.xpoints = new int[ga.owner.form.nPoints];
-				ps.ypoints = new int[ga.owner.form.nPoints];
-				speedSlide.setValue((int) (10 * Math.log(ga.speed) / Math.log(2)));
+				ps.figure = newFig;
+				ps.xpoints = new int[newFig.struct.NPTS];
+				ps.ypoints = new int[newFig.struct.NPTS];
+//				speedSlide.setValue((int) (10 * Math.log(ga.speed) / Math.log(2)));
 			}
 		} else if (evt.getSource() == save) {
-			JFileChooser chooser = new JFileChooser();
+			JFileChooser chooser = new JFileChooser(ps.figure.getFileName());
 			chooser.setCurrentDirectory(new File(System.getProperty("user.dir"), "Resources"));
 			chooser.setFileFilter(new javax.swing.filechooser.FileFilter() {
 				public boolean accept(File f) {
-					return (f.getName().endsWith(".anim") || f.isDirectory());
+					return (f.getName().endsWith(".fig") || f.isDirectory());
 				}
 
 				public String getDescription() {
-					return "Animation (.anim)";
+					return "Figure (.fig)";
 				}
 			});
 			int r = chooser.showSaveDialog(this);
 			if (r == JFileChooser.APPROVE_OPTION) {
 				String dir = chooser.getSelectedFile().getAbsolutePath();
-				if (!(dir.endsWith(".anim")))
-					dir += ".anim";
-				IOMaster.writeToFile(dir, animation.export());
+				if (!(dir.endsWith(".fig")))
+					dir += ".fig";
 			}
+			
+			ps.figure.saveToFile();
+
 		}
 
 		else if (evt.getSource() == next && ps.current < ps.poses.size() - 1) {
@@ -257,14 +258,14 @@ public class AnimationCreator extends JPanel implements ActionListener, ChangeLi
 		} else if (evt.getSource() == end) {
 			moveFrame(ps.poses.size() - 1);
 		} else if (evt.getSource() == original) {
-			ps.poses.set(ps.current, ps.figure.form.defaultPose.clone());
+			ps.poses.set(ps.current, ps.figure.struct.defaultPose.clone());
 		} else if (evt.getSource() == del) {
 			ps.poses.remove(ps.current);
 			if (ps.current > 0)
 				ps.current--;
 		} else if (evt.getSource() == clr) {
 			ps.poses.clear();
-			ps.poses.add(ps.figure.form.defaultPose.clone());
+			ps.poses.add(ps.figure.struct.defaultPose.clone());
 			ps.current = 0;
 		}
 	}
@@ -272,7 +273,7 @@ public class AnimationCreator extends JPanel implements ActionListener, ChangeLi
 	@Override
 	public void stateChanged(ChangeEvent evt) {
 		if (evt.getSource() == speedSlide)
-			animation.speed = Math.pow(2, speedSlide.getValue() / 10D);
+			ps.anim.speed = Math.pow(2, speedSlide.getValue() / 10D);
 	}
 
 	public void moveFrame(int n) {
@@ -287,9 +288,13 @@ public class AnimationCreator extends JPanel implements ActionListener, ChangeLi
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
+			System.out.println("UPDATE");
 
-			if (ps.running)
-				ps.current = ps.figure.update(0.05, 0) % ps.poses.size();
+			
+
+			//TODO: ???
+//			if (ps.running)
+//				ps.current = ps.figure.update(0.05, 0) % ps.poses.size();
 
 			timeline.update();
 			update();

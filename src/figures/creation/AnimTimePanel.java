@@ -1,4 +1,3 @@
-
 package figures.creation;
 
 import java.awt.Color;
@@ -18,7 +17,10 @@ import java.util.HashSet;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
-public class AnimTimePanel extends JPanel implements MouseListener, MouseMotionListener,
+import figures.FigPose;
+
+public class AnimTimePanel extends JPanel implements MouseListener,
+		MouseMotionListener,
 		ActionListener {
 	private static final long serialVersionUID = -586712284739201373L;
 
@@ -86,8 +88,8 @@ public class AnimTimePanel extends JPanel implements MouseListener, MouseMotionL
 					toDo.add(i);
 
 			for (int i = 0; i < toDo.size(); i++) {
-				Pose p1 = pc.poses.get(i), p2 = pc.poses.get(i + 1);
-				Pose p = Pose.meldTransform(p1, p2, 0.5, null);
+				FigPose p1 = pc.poses.get(i), p2 = pc.poses.get(i + 1);
+				FigPose p = FigPose.linearMeld(p1, p2, 0.5);
 
 				pc.poses.add(i + 1, p);
 				if (pc.current > i)
@@ -101,25 +103,31 @@ public class AnimTimePanel extends JPanel implements MouseListener, MouseMotionL
 
 		Graphics2D g = (Graphics2D) gr;
 
-		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+				RenderingHints.VALUE_ANTIALIAS_ON);
 
 		for (int i = 0; i < pc.poses.size(); i++) {
 			int size = getRadius();
 			g.setColor(Color.BLACK);
 			g.fillOval(getX(i) - size, getY(i) - size, 2 * size, 2 * size);
-			g.setColor(i == pc.current ? Color.MAGENTA : (selected.contains(i) ? new Color(0, 150,
-					255) : Color.gray));
+			g.setColor(i == pc.current ? Color.MAGENTA
+					: (selected.contains(i) ? new Color(0, 150,
+							255) : Color.gray));
 			g.drawOval(getX(i) - size, getY(i) - size, size * 2, size * 2);
 		}
 
 		if (beginPressY > 0) {
 			g.setColor(new Color(0, 150, 255, 30));
 
-			g.fillRect(Math.min(beginPressX, currMouseX), Math.min(beginPressY, currMouseY),
-					Math.abs(currMouseX - beginPressX), Math.abs(currMouseY - beginPressY));
+			g.fillRect(Math.min(beginPressX, currMouseX),
+					Math.min(beginPressY, currMouseY),
+					Math.abs(currMouseX - beginPressX),
+					Math.abs(currMouseY - beginPressY));
 			g.setColor(new Color(0, 150, 255));
-			g.drawRect(Math.min(beginPressX, currMouseX), Math.min(beginPressY, currMouseY),
-					Math.abs(currMouseX - beginPressX), Math.abs(currMouseY - beginPressY));
+			g.drawRect(Math.min(beginPressX, currMouseX),
+					Math.min(beginPressY, currMouseY),
+					Math.abs(currMouseX - beginPressX),
+					Math.abs(currMouseY - beginPressY));
 		}
 	}
 
@@ -136,7 +144,7 @@ public class AnimTimePanel extends JPanel implements MouseListener, MouseMotionL
 	}
 
 	public int getRadius() {
-		return Math.min( (getWidth() - 100) / pc.poses.size(), 30) / 2;
+		return Math.min((getWidth() - 100) / pc.poses.size(), 30) / 2;
 	}
 
 	public void mouseDragged(MouseEvent evt) {
@@ -163,7 +171,7 @@ public class AnimTimePanel extends JPanel implements MouseListener, MouseMotionL
 		int mx = evt.getX(), my = evt.getY();
 		for (int i = 0; i < pc.poses.size(); i++) {
 			double xi = getX(i), yi = getY(i), r = getRadius();
-			if ( (xi - mx) * (xi - mx) + (yi - my) * (yi - my) < r * r) {
+			if ((xi - mx) * (xi - mx) + (yi - my) * (yi - my) < r * r) {
 				pc.current = i;
 			}
 		}
@@ -178,14 +186,18 @@ public class AnimTimePanel extends JPanel implements MouseListener, MouseMotionL
 
 	public void mouseReleased(MouseEvent evt) {
 		if (!evt.isMetaDown()) {
-			int minx = Math.min(beginPressX, currMouseX), maxx = Math.max(beginPressX, currMouseX), miny = Math
-					.min(beginPressY, currMouseY), maxy = Math.max(beginPressY, currMouseY);
+			int minx = Math.min(beginPressX, currMouseX), maxx =
+					Math.max(beginPressX, currMouseX), miny = Math
+					.min(beginPressY, currMouseY), maxy =
+					Math.max(beginPressY, currMouseY);
 
-			if ( (minx - maxx) * (minx - maxx) + (miny - maxy) * (miny - maxy) > 200) {
-				if (! (keys.contains(KeyEvent.VK_CONTROL) || keys.contains(KeyEvent.VK_SHIFT)))
+			if ((minx - maxx) * (minx - maxx) + (miny - maxy) * (miny - maxy) > 200) {
+				if (!(keys.contains(KeyEvent.VK_CONTROL) || keys
+						.contains(KeyEvent.VK_SHIFT)))
 					selected.clear();
 				for (int i = 0; i < pc.poses.size(); i++) {
-					if (getX(i) > minx && getX(i) < maxx && getY(i) > miny && getY(i) < maxy)
+					if (getX(i) > minx && getX(i) < maxx && getY(i) > miny
+							&& getY(i) < maxy)
 						if (keys.contains(KeyEvent.VK_SHIFT))
 							selected.remove(i);
 						else

@@ -102,8 +102,10 @@ public class Game extends JPanel implements KeyListener, Runnable {
 
 		Graphics2D g = (Graphics2D) grr;
 
-		g.setColor(Methods.getColor(world.background, 100));
+		g.setColor(Methods.getColor(world.background, 155));
 		g.fill(g.getClip());
+
+		System.out.println(view.pos.clone().sub(view.pos_synced));
 
 		view.synchronize();
 		world.current.draw(g, view);

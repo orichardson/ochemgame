@@ -24,13 +24,13 @@ public class Eye extends SceneNode {
 	// **** VARS THAT REQUIRE SYNCHRONIZATION
 	Matrix rotator, invrotator;
 	double ortho_synced;
-	Vector3D pos_synced;
+	public Vector3D pos_synced;
 
 	// **** Non-synchronized variables
 	public double ortho = 0; // between 0 and 1;
 
 	public Vector3D focus = new Vector3D();
-	Vector3D pos;
+	public Vector3D pos;
 
 	public double alpha = -Math.PI / 2, beta = 0, spin = Math.PI / 2;
 	public double da, db, ds;
@@ -112,7 +112,7 @@ public class Eye extends SceneNode {
 	}
 
 	public boolean cull(Vector3D v) {
-		return true;
+		return false;
 		// return v.clone()
 		// .sub(this)
 		// .angleBetween(

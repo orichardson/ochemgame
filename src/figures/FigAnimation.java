@@ -6,10 +6,11 @@ import java.util.ArrayList;
 public class FigAnimation {
 	String name;
 
-	int interpolationMode;
+	public double speed = 1.0;
+	public int interpolationMode;
 	// 0 -->
 
-	double currentIndex;
+	private double currentIndex;
 	private FigPose currentPose;
 
 	public ArrayList<FigPose> poses = new ArrayList<FigPose>();

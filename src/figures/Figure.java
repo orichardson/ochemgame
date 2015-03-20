@@ -1,4 +1,3 @@
-
 package figures;
 
 import java.io.File;
@@ -30,8 +29,9 @@ public class Figure {
 	}
 
 	public static Figure createEmptyFigure(int npts) {
-		String structstr = Methods.getFileContents(new File("Resources/Structures/" + npts
-				+ "PTFIG.struct"));
+		String structstr =
+				Methods.getFileContents(new File("Resources/Figure/Structures/" + npts
+						+ "PTFIG.struct"));
 		return new Figure(FigStructure.unpack(structstr));
 	}
 
@@ -45,9 +45,14 @@ public class Figure {
 	}
 
 	public static Figure fromFile(String filename) {
-		String[] lines = Methods.getFileContents(new File(filename)).split("\n");
+		String[] lines =
+				Methods.getFileContents(new File(filename)).split("\n");
 
 		FigStructure struct = FigStructure.unpack(lines[0]);
 		return new Figure(struct);
+	}
+
+	public String getFileName() {
+		return fileName;
 	}
 }

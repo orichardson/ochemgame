@@ -1,4 +1,3 @@
-
 package figures;
 
 import java.awt.Color;
@@ -20,7 +19,7 @@ public class FigStructure {
 	public Color[] colors;
 
 	public FigPose defaultPose;
-	
+
 	String fileName;
 
 	// empty private constructor (want to create via static factory methods)
@@ -39,7 +38,8 @@ public class FigStructure {
 		strb.append("TRI1\t|" + save(tri1) + "\n");
 		strb.append("TRI2\t|" + save(tri2) + "\n");
 		strb.append("TRI3\t|" + save(tri3) + "\n");
-		strb.append("COLORS\t|" + save(colors));
+		strb.append("COLORS\t|" + save(colors) + "\n\n");
+		strb.append("DEFAULT\t|" + defaultPose.pack());
 
 		return strb.toString();
 	}
@@ -71,7 +71,7 @@ public class FigStructure {
 			if (!lines[i].contains("|"))
 				continue;
 
-			String data = lines[i].substring(lines[i].indexOf("|") + 1);
+			String data = lines[i].substring(lines[i].indexOf("|") + 1).trim();
 
 			if (lines[i].startsWith("NPTS\t|"))
 				struct.NPTS = Integer.parseInt(data);
@@ -110,26 +110,36 @@ public class FigStructure {
 		}
 
 		if (struct.tri1 == null) {
-			struct.NTRIS = 0;
 			struct.tri1 = new int[0];
 			struct.tri2 = new int[0];
 			struct.tri3 = new int[0];
+			struct.colors = new Color[0];
 		}
 
 		struct.NLINES = struct.line1.length;
 		struct.NTRIS = struct.tri1.length;
 
-		if (struct.line2.length != struct.NLINES || struct.lengths.length != struct.NLINES)
+		if (struct.lengths == null) {
+			struct.lengths = new double[struct.NLINES];
+			if (struct.defaultPose != null)
+				for (int i = 0; i < struct.NLINES; i++)
+					struct.lengths[i] =
+							Math.sqrt(struct.defaultPose.pos[struct.line1[i]]
+									.dist2(struct.defaultPose.pos[struct.line2[i]]));
+		}
+
+		if (struct.line2.length != struct.NLINES
+				|| struct.lengths.length != struct.NLINES)
 			throw new IllegalArgumentException(
 					"Malformed Struct File: ragged length numbers !( |end1| == |end2| == |length| )");
 
-		if (struct.colors.length != struct.NTRIS || struct.tri2.length != struct.NTRIS
+		if ((struct.colors != null && struct.colors.length != struct.NTRIS)
+				|| struct.tri2.length != struct.NTRIS
 				|| struct.tri3.length != struct.NTRIS)
 			throw new IllegalArgumentException(
 					"Malformed Struct File: ragged length numbers !( |tri1| == |tri2| == |tri3| == |color| )");
 
 		struct.computeNeighbors();
-
 		return struct;
 	}
 	// ***** helper methods...
@@ -155,21 +165,24 @@ public class FigStructure {
 		StringBuilder sb = new StringBuilder();
 		for (Color i : things)
 			sb.append(i.getRGB() + "\t");
-		sb.deleteCharAt(sb.length() - 1);
+		if (things.length > 0)
+			sb.deleteCharAt(sb.length() - 1);
 		return sb.toString();
 	}
 	public static String save(int[] things) {
 		StringBuilder sb = new StringBuilder();
 		for (int i : things)
 			sb.append(i + "\t");
-		sb.deleteCharAt(sb.length() - 1);
+		if (things.length > 0)
+			sb.deleteCharAt(sb.length() - 1);
 		return sb.toString();
 	}
 	public static String save(double[] things) {
 		StringBuilder sb = new StringBuilder();
 		for (double i : things)
 			sb.append(i + "\t");
-		sb.deleteCharAt(sb.length() - 1);
+		if (things.length > 0)
+			sb.deleteCharAt(sb.length() - 1);
 		return sb.toString();
 	}
 }
