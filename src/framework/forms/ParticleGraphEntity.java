@@ -18,6 +18,6 @@ public abstract class ParticleGraphEntity extends SceneNode {
 		super.update(g, speed);
 
 		for (int i = 0; i < particles.length; i++)
-			particles[i].update();
+			particles[i].update(speed);
 	}
 }

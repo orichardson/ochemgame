@@ -1,3 +1,4 @@
+
 package game;
 
 import java.awt.Color;
@@ -20,8 +21,7 @@ import framework.forms.Player;
 
 public class Game extends JPanel implements KeyListener, Runnable {
 	// public static Dimension SCREEN = new Dimension(700,400);
-	public static Dimension SCREEN = Toolkit.getDefaultToolkit()
-			.getScreenSize();
+	public static Dimension SCREEN = Toolkit.getDefaultToolkit().getScreenSize();
 
 	private static final long serialVersionUID = 4092070700879219267L;
 
@@ -31,9 +31,8 @@ public class Game extends JPanel implements KeyListener, Runnable {
 
 	public HashSet<Integer> keys = new HashSet<Integer>();
 
-	private int fps, minFPS, updateFPS;
-	private long lastTime = System.currentTimeMillis(), ltUpdate = System
-			.currentTimeMillis();
+	private float fps, minFPS, updateFPS;
+	private long lastTime = System.currentTimeMillis(), ltUpdate = System.currentTimeMillis();
 
 	private ReentrantLock lock = new ReentrantLock();
 
@@ -65,7 +64,7 @@ public class Game extends JPanel implements KeyListener, Runnable {
 			counter++;
 
 			long t = System.currentTimeMillis();
-			updateFPS = (int) (1000f / (t - ltUpdate));
+			updateFPS = (1000f / (t - ltUpdate));
 			double factor = 10D / (t - ltUpdate);
 			ltUpdate = t;
 
@@ -92,7 +91,7 @@ public class Game extends JPanel implements KeyListener, Runnable {
 			repaint();
 
 			try {
-				Thread.sleep(12);
+				Thread.sleep(6);
 			} catch (Exception e) {}
 		}
 	}
@@ -100,14 +99,15 @@ public class Game extends JPanel implements KeyListener, Runnable {
 	public void paintComponent(Graphics grr) {
 		long t = System.currentTimeMillis();
 
-		fps = (int) (1000f / (t - lastTime));
+		fps = (1000f / (t - lastTime));
 		if (fps < minFPS)
 			minFPS = fps;
 		lastTime = t;
 
 		Graphics2D g = (Graphics2D) grr;
 
-		g.setColor(Methods.getColor(world.background, 150));
+		int trans = (int) (255 * 60 / (60 + fps));
+		g.setColor(Methods.getColor(world.background, trans));
 		g.fill(g.getClip());
 
 		lock.lock();
@@ -117,12 +117,12 @@ public class Game extends JPanel implements KeyListener, Runnable {
 		world.current.draw(g, view);
 
 		// draw fps and other debug information
-		if (keys.contains(KeyEvent.VK_F1)) {
-			g.setColor(Color.WHITE);
-			g.drawString("[paint fps] " + fps, 20, 40);
-			g.drawString("[min paint] " + minFPS, 20, 60);
-			g.drawString("[update fps] " + updateFPS, 20, 80);
-		}
+		// if (keys.contains(KeyEvent.VK_F1)) {
+		g.setColor(Color.WHITE);
+		g.drawString("[paint fps] " + fps, 20, 40);
+		g.drawString("[min paint] " + minFPS, 20, 60);
+		g.drawString("[update fps] " + updateFPS, 20, 80);
+		// }
 	}
 
 	@Override

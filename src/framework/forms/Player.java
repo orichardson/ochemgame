@@ -45,11 +45,9 @@ public class Player extends ParticleGraphEntity {
 	@Override
 	public void update(Game g, double speed) {
 		super.update(g, speed);
-		
 
-		for (int i = 0; i < particles.length; i++) {
-			particles[i].update();
-		}
+		for (int i = 0; i < particles.length; i++)
+			particles[i].update(speed);
 
 		if (form instanceof Form.Duality) {
 			Form.Duality fd = ((Form.Duality) form);

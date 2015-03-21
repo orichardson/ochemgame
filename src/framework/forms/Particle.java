@@ -1,3 +1,4 @@
+
 package framework.forms;
 
 import java.awt.BasicStroke;
@@ -43,8 +44,8 @@ public class Particle extends SceneNode {
 		this.color = Color.white;
 	}
 
-	public void update() {
-		phase += 0.01;
+	public void update(double factor) {
+		phase += 0.005 / factor;
 		fuzz = (Math.sin(phase) + 1) * 0.5;
 
 		Dot d = form.getDot(target);
@@ -64,13 +65,14 @@ public class Particle extends SceneNode {
 					form.getDot(target).pos.clone().sub(pos).normalize()
 							.scale(velo.magnitude() * 0.9), velo, fuzz);
 		} else {
-			velo.scale(0.99);
+			velo.scale(Math.pow(0.98, factor));
 
-			velo =
-					Vector3D.meld(f.clone().scale(veloTransform(d2)), velo,
-							Math.pow(fuzz, 0.2)); // velo
-													// only
-			velo.add(f.clone().scale(veloTransform(d2)).scale((fuzz) * 0.01)); // acceleration only
+			f.scale(veloTransform(d2));
+
+			// velo only
+			velo = Vector3D.meld(f, velo, Math.pow(fuzz, 0.2));
+			// acceleration only
+			velo.addScaled(f, fuzz * 0.01);
 
 			velo.add(Vector3D.random(0.001 * fuzz));
 
@@ -78,7 +80,7 @@ public class Particle extends SceneNode {
 
 			// velo.scale(1 - Methods.bound(.01 / (1+ pos.dist2(d.pos)), 0, 1));
 
-			pos.add(velo);
+			pos.addScaled(velo, 1 / factor);
 		}
 
 	}
@@ -89,7 +91,7 @@ public class Particle extends SceneNode {
 
 	private double veloTransform(double d) {
 		// return speed * 0.003 / (1 + Math.exp(d * 0.01 - 1));
-		return 0.01 * speed * (10 * d * d + 1);
+		return 0.005 * speed * (7 * d * d + 1);
 	}
 
 	private Vector3D last;
@@ -105,8 +107,7 @@ public class Particle extends SceneNode {
 			g.fillRect((int) v.x - r, (int) v.y - r, (r * 2 + 1), (r * 2 + 1));
 
 			if (last != null) {
-				Vector3D v2 =
-						e.toScreenDepthBufferUpdate(m.applyTo(last), size);
+				Vector3D v2 = e.toScreenDepthBufferUpdate(m.applyTo(last), size);
 				if (v2 != null) {
 					g.setStroke(new BasicStroke(r * 2));
 					g.drawLine((int) v.x, (int) v.y, (int) v2.x, (int) v2.y);

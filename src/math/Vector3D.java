@@ -167,6 +167,13 @@ public class Vector3D {
 		return this;
 	}
 
+	public Vector3D addScaled(Vector3D v, double d) {
+		x += v.x * d;
+		y += v.y * d;
+		z += v.z * d;
+		return this;
+	}
+
 	public double mag2() {
 		return x * x + y * y + z * z;
 	}
@@ -289,4 +296,5 @@ public class Vector3D {
 		// System.out.println(w+"\t"+a2+"\t"+(w-a2));
 		return (a0 * x2 * prc) + a1 * x2 + a2 * prc + p1;
 	}
+
 }
