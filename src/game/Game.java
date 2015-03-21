@@ -8,6 +8,7 @@ import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.HashSet;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -33,6 +34,8 @@ public class Game extends JPanel implements KeyListener, Runnable {
 	private int fps, minFPS, updateFPS;
 	private long lastTime = System.currentTimeMillis(), ltUpdate = System
 			.currentTimeMillis();
+
+	private ReentrantLock lock = new ReentrantLock();
 
 	public Game() {
 		setDoubleBuffered(false);
@@ -80,15 +83,11 @@ public class Game extends JPanel implements KeyListener, Runnable {
 			if (keys.contains(KeyEvent.VK_Z))
 				view.db -= diff / factor;
 
+			lock.lock();
+			world.update(this, factor);
 			view.focusApproach(player.pos, factor);
 			view.updatePosition();
-
-			// NOTE: this update method MUST be called after
-			// changes to angles and positions; otherwise, there will
-			// be a missed camera update where it doesn't respond to updates
-			// i.e. weirdest bug I've ever had the pleasure of working with.
-			// Don't put stuff below this line.
-			world.update(this, factor);
+			lock.unlock();
 
 			repaint();
 
@@ -99,8 +98,6 @@ public class Game extends JPanel implements KeyListener, Runnable {
 	}
 
 	public void paintComponent(Graphics grr) {
-		// super.paintComponent(grr);
-
 		long t = System.currentTimeMillis();
 
 		fps = (int) (1000f / (t - lastTime));
@@ -110,15 +107,22 @@ public class Game extends JPanel implements KeyListener, Runnable {
 
 		Graphics2D g = (Graphics2D) grr;
 
-		g.setColor(Methods.getColor(world.background, 245));
+		g.setColor(Methods.getColor(world.background, 150));
 		g.fill(g.getClip());
 
+		lock.lock();
 		view.synchronize();
+		lock.unlock();
 
 		world.current.draw(g, view);
 
-		g.setColor(Color.WHITE);
-		g.drawString(fps + ", " + minFPS + ", " + updateFPS, 20, 40);
+		// draw fps and other debug information
+		if (keys.contains(KeyEvent.VK_F1)) {
+			g.setColor(Color.WHITE);
+			g.drawString("[paint fps] " + fps, 20, 40);
+			g.drawString("[min paint] " + minFPS, 20, 60);
+			g.drawString("[update fps] " + updateFPS, 20, 80);
+		}
 	}
 
 	@Override

@@ -105,11 +105,30 @@ public class Eye extends SceneNode {
 		if (grain > 0)
 			dmap = new double[(screen.width / grain) * (screen.height / grain)];
 	}
-
-	public void focusApproach(Vector2D v, double factor) {
+	public void focusApproach(Vector3D v, double factor) {
 		focus.x += (v.x - focus.x) / (factor * followK);
 		focus.y += (v.y - focus.y) / (factor * followK);
-		updatePosition();
+		focus.z += (v.z - focus.z) / (factor * followK);
+	}
+
+	@Override
+	public void update(Game g, double speed) {
+		alpha += da / speed;
+		beta = Methods.bound(beta + db / speed, -Math.PI, 0);
+		spin += ds / speed;
+
+		double f = Math.pow(0.97, 1 / speed);
+
+		da *= f;
+		db *= f;
+		ds *= f;
+
+		sunDir.incrementAngle(0.01 / speed);
+	}
+
+	public double faceDist(Vector3D v) {
+		Vector3D raw = rotator.applyTo(v.clone().sub(pos_synced));
+		return -raw.z;
 	}
 
 	public boolean cull(Vector3D v) {
@@ -144,17 +163,6 @@ public class Eye extends SceneNode {
 		return e2;
 	}
 
-	public void focusApproach(Vector3D v, double factor) {
-		focus.x += (v.x - focus.x) / (factor * followK);
-		focus.y += (v.y - focus.y) / (factor * followK);
-		focus.z += (v.z - focus.z) / (factor * followK);
-	}
-
-	public double faceDist(Vector3D v) {
-		Vector3D raw = rotator.applyTo(v.clone().sub(pos_synced));
-		return -raw.z;
-	}
-
 	public Vector3D toScreen(Vector3D v) {
 		if (v == null)
 			return null;
@@ -176,8 +184,7 @@ public class Eye extends SceneNode {
 		if (v == null)
 			return null;
 
-		Vector3D diff = v.clone().sub(pos_synced);
-		Vector3D raw = rotator.applyTo(diff);
+		Vector3D raw = rotator.applyTo(v.sub(pos_synced));
 		raw.z = -raw.z;
 
 		if (raw.z <= 0)
@@ -274,20 +281,5 @@ public class Eye extends SceneNode {
 	public void setScreen(int width, int height) {
 		screen.width = width;
 		screen.height = height;
-	}
-
-	@Override
-	public void update(Game g, double speed) {
-		alpha += da;
-		beta = Methods.bound(db + beta, -Math.PI, 0);
-		spin += ds;
-
-		double f = Math.pow(0.97, 1 / speed);
-
-		da *= f;
-		db *= f;
-		ds *= f;
-
-		sunDir.incrementAngle(0.01);
 	}
 }
