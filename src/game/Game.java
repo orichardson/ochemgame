@@ -1,4 +1,3 @@
-
 package game;
 
 import java.awt.Color;
@@ -20,7 +19,8 @@ import framework.forms.Player;
 
 public class Game extends JPanel implements KeyListener, Runnable {
 	// public static Dimension SCREEN = new Dimension(700,400);
-	public static Dimension SCREEN = Toolkit.getDefaultToolkit().getScreenSize();
+	public static Dimension SCREEN = Toolkit.getDefaultToolkit()
+			.getScreenSize();
 
 	private static final long serialVersionUID = 4092070700879219267L;
 
@@ -31,9 +31,11 @@ public class Game extends JPanel implements KeyListener, Runnable {
 	public HashSet<Integer> keys = new HashSet<Integer>();
 
 	private int fps, minFPS, updateFPS;
-	private long lastTime = System.currentTimeMillis(), ltUpdate = System.currentTimeMillis();
+	private long lastTime = System.currentTimeMillis(), ltUpdate = System
+			.currentTimeMillis();
 
 	public Game() {
+		setDoubleBuffered(false);
 		world = new World();
 
 		view = new Eye(world.current, SCREEN);
@@ -78,9 +80,15 @@ public class Game extends JPanel implements KeyListener, Runnable {
 			if (keys.contains(KeyEvent.VK_Z))
 				view.db -= diff / factor;
 
-			world.update(this, factor);
-
 			view.focusApproach(player.pos, factor);
+			view.updatePosition();
+
+			// NOTE: this update method MUST be called after
+			// changes to angles and positions; otherwise, there will
+			// be a missed camera update where it doesn't respond to updates
+			// i.e. weirdest bug I've ever had the pleasure of working with.
+			// Don't put stuff below this line.
+			world.update(this, factor);
 
 			repaint();
 
@@ -102,12 +110,11 @@ public class Game extends JPanel implements KeyListener, Runnable {
 
 		Graphics2D g = (Graphics2D) grr;
 
-		g.setColor(Methods.getColor(world.background, 155));
+		g.setColor(Methods.getColor(world.background, 245));
 		g.fill(g.getClip());
 
-		System.out.println(view.pos.clone().sub(view.pos_synced));
-
 		view.synchronize();
+
 		world.current.draw(g, view);
 
 		g.setColor(Color.WHITE);

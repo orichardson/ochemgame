@@ -1,4 +1,3 @@
-
 package framework;
 
 import game.Game;
@@ -21,7 +20,7 @@ public abstract class SceneNode {
 
 	public SceneNode(SceneNode p) {
 		this.transform = Matrix.createID(4);
-		this.precalculated= Matrix.createID(4);
+		this.precalculated = Matrix.createID(4);
 
 		setParent(p);
 	}
@@ -98,7 +97,7 @@ public abstract class SceneNode {
 
 	// ************** Override methods ***************
 
-	public void update(Game g, double speed) {		
+	public void update(Game g, double speed) {
 		if (updateChildren)
 			for (SceneNode n : children)
 				n.update(g, speed);
@@ -107,7 +106,6 @@ public abstract class SceneNode {
 	public void draw(Graphics2D g, Eye e) {
 		if (!visible)
 			return;
-
 		for (SceneNode n : children)
 			n.draw(g, e);
 	}

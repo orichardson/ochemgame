@@ -1,4 +1,3 @@
-
 package framework;
 
 import game.Game;
@@ -17,20 +16,20 @@ public class Eye extends SceneNode {
 
 	public Vector3D sunDir = new Vector3D(0, 1, 4);
 
-	Dimension screen;
+	public Dimension screen;
 
-	double scale = 1000;
+	public double scale = 1000;
 
 	// **** VARS THAT REQUIRE SYNCHRONIZATION
-	Matrix rotator, invrotator;
-	double ortho_synced;
+	public Matrix rotator, invrotator;
+	private double ortho_synced;
 	public Vector3D pos_synced;
 
 	// **** Non-synchronized variables
 	public double ortho = 0; // between 0 and 1;
 
 	public Vector3D focus = new Vector3D();
-	public Vector3D pos;
+	private Vector3D pos;
 
 	public double alpha = -Math.PI / 2, beta = 0, spin = Math.PI / 2;
 	public double da, db, ds;
@@ -40,7 +39,7 @@ public class Eye extends SceneNode {
 
 	// **************** DEPTH MAP VARS ************
 
-	int grain = 1; // negative grain means no depth map use.
+	int grain = 2; // negative grain means no depth map use.
 	private double[] dmap;
 
 	public Eye(SceneNode parent, Dimension screen) {
@@ -75,24 +74,26 @@ public class Eye extends SceneNode {
 			if (mode == 0)
 				prc = getPercent(norm.angleBetween(sunDir));
 			else if (mode == 1) {
-				prc = getPercent(Math.abs(Math.PI / 2 - norm.angleBetween(sunDir)));
+				prc =
+						getPercent(Math.abs(Math.PI / 2
+								- norm.angleBetween(sunDir)));
 			}
 		}
 
-		Color clr = new Color((int) (prc * Methods.bound(last.x, 0, 255)),
-				(int) (prc * Methods.bound(last.y, 0, 255)), (int) (prc * Methods.bound(last.z, 0,
-						255)), c.getAlpha());
+		Color clr =
+				new Color((int) (prc * Methods.bound(last.x, 0, 255)),
+						(int) (prc * Methods.bound(last.y, 0, 255)),
+						(int) (prc * Methods.bound(last.z, 0,
+								255)), c.getAlpha());
 		return clr;
-	}
-
-	public Matrix getRotator() {
-		return rotator;
 	}
 
 	public void updatePosition() {
 		pos = focus.clone().add(
-				Matrix.create3DEulerRotMatrix(spin, beta, alpha).calculateInverse()
-						.applyTo(new Vector3D(0, 0, leash)));
+				Matrix.create3DEulerRotMatrix(spin, beta, alpha)
+						.calculateInverse()
+						.applyTo(new Vector3D(0, 0, leash))
+				);
 	}
 
 	public void synchronize() {
@@ -102,7 +103,7 @@ public class Eye extends SceneNode {
 		ortho_synced = ortho;
 
 		if (grain > 0)
-			dmap = new double[ (screen.width / grain) * (screen.height / grain)];
+			dmap = new double[(screen.width / grain) * (screen.height / grain)];
 	}
 
 	public void focusApproach(Vector2D v, double factor) {
@@ -120,11 +121,33 @@ public class Eye extends SceneNode {
 		// .applyTo(new Vector3D(0, 0, leash))) > Math.PI / 4;
 	}
 
+	@Deprecated
+	public Eye clone() {
+		Eye e2 = new Eye(null, this.screen);
+		e2.alpha = alpha;
+		e2.beta = beta;
+		e2.spin = spin;
+		e2.da = da;
+		e2.db = db;
+		e2.ds = ds;
+
+		e2.pos = pos.clone();
+		e2.pos_synced = pos_synced.clone();
+		e2.focus = focus.clone();
+		e2.rotator = rotator.clone();
+		e2.invrotator = invrotator.clone();
+
+		e2.ortho = ortho;
+		e2.ortho_synced = ortho_synced;
+		e2.leash = leash;
+
+		return e2;
+	}
+
 	public void focusApproach(Vector3D v, double factor) {
 		focus.x += (v.x - focus.x) / (factor * followK);
 		focus.y += (v.y - focus.y) / (factor * followK);
 		focus.z += (v.z - focus.z) / (factor * followK);
-		updatePosition();
 	}
 
 	public double faceDist(Vector3D v) {
@@ -135,11 +158,12 @@ public class Eye extends SceneNode {
 	public Vector3D toScreen(Vector3D v) {
 		if (v == null)
 			return null;
-		Vector3D raw = rotator.applyTo(v.clone().sub(pos_synced));
+		Vector3D raw = rotator.applyTo(v.sub(pos_synced));
 		if (raw.z > -0.5)
 			return null;
 
-		double a = raw.x / leash, b = raw.y / leash, c = -raw.x / raw.z, d = -raw.y / raw.z;
+		double a = raw.x / leash, b = raw.y / leash, c = -raw.x / raw.z, d =
+				-raw.y / raw.z;
 
 		return new Vector3D(c + (a - c) * ortho, d + (b - d) * ortho, -raw.z);
 	}
@@ -152,34 +176,45 @@ public class Eye extends SceneNode {
 		if (v == null)
 			return null;
 
-		Vector3D raw = rotator.applyTo(v.clone().sub(pos_synced));
+		Vector3D diff = v.clone().sub(pos_synced);
+		Vector3D raw = rotator.applyTo(diff);
 		raw.z = -raw.z;
 
 		if (raw.z <= 0)
 			return null;
 
-		double a = raw.x / leash, b = raw.y / leash, c = raw.x / raw.z, d = raw.y / raw.z;
+		double a = raw.x / leash, b = raw.y / leash, c = raw.x / raw.z, d =
+				raw.y / raw.z;
 
-		Vector3D nice = new Vector3D(psX(c + (a - c) * ortho), psY(d + (b - d) * ortho), size
-				/ raw.z);
+		Vector3D nice =
+				new Vector3D(psX(c + (a - c) * ortho),
+						psY(d + (b - d) * ortho), size
+								/ raw.z);
 
-		if (nice.x < 0 || nice.x >= screen.width || nice.y < 0 || nice.y >= screen.height)
+		if (nice.x < 0 || nice.x >= screen.width || nice.y < 0
+				|| nice.y >= screen.height)
 			return null;
 
 		if (grain > 0 && size > 0) { // only do this if there IS a depth buffer...
 			int buffer_width = screen.width / grain;
 
-			double centerDist = dmap[(int) (nice.x / grain) + (int) (nice.y / grain) * buffer_width];
+			double centerDist =
+					dmap[(int) (nice.x / grain) + (int) (nice.y / grain)
+							* buffer_width];
 
 			if (centerDist != 0 && raw.z > centerDist)
 				return null;
 
-			for (int i = Math.max((int) (nice.x - nice.z) / grain, 0); i < Math.min(
-					(int) (nice.x + nice.z) / grain, buffer_width); i++)
-				for (int j = Math.max((int) (nice.y - nice.z) / grain, 0); j < Math.min(
-						(int) (nice.y + nice.z) / grain, screen.height / grain); j++) {
+			for (int i = Math.max((int) (nice.x - nice.z) / grain, 0); i < Math
+					.min(
+							(int) (nice.x + nice.z) / grain, buffer_width); i++)
+				for (int j = Math.max((int) (nice.y - nice.z) / grain, 0); j < Math
+						.min(
+								(int) (nice.y + nice.z) / grain, screen.height
+										/ grain); j++) {
 					double dist = dmap[i + buffer_width * j];
-					dmap[i + buffer_width * j] = dist == 0 ? raw.z : Math.min(dist, raw.z);
+					dmap[i + buffer_width * j] =
+							dist == 0 ? raw.z : Math.min(dist, raw.z);
 				}
 		}
 
@@ -191,13 +226,16 @@ public class Eye extends SceneNode {
 	}
 
 	public Vector3D pickBasic(int x, int y) { // for now assume return z = 0
-		return invrotator.applyTo(new Vector3D(ssX(x) * leash, ssY(y) * leash, -leash)).add(
+		return invrotator.applyTo(
+				new Vector3D(ssX(x) * leash, ssY(y) * leash, -leash)).add(
 				pos_synced);
 	}
 
 	public Vector3D pickDist(int x, int y, double dist) {
-		return Vector3D.meld(invrotator.applyTo(new Vector3D(ssX(x) * dist, ssY(y) * dist, -dist))
-				.add(pos_synced), pickBasic(x, y), ortho_synced);
+		return Vector3D.meld(
+				invrotator.applyTo(
+						new Vector3D(ssX(x) * dist, ssY(y) * dist, -dist))
+						.add(pos_synced), pickBasic(x, y), ortho_synced);
 	}
 
 	/**
@@ -229,7 +267,8 @@ public class Eye extends SceneNode {
 	}
 
 	public Vector3D calculateDirection() {
-		return new Vector3D(rotator.get(2, 0), rotator.get(2, 1), rotator.get(2, 2));
+		return new Vector3D(rotator.get(2, 0), rotator.get(2, 1), rotator.get(
+				2, 2));
 	}
 
 	public void setScreen(int width, int height) {
@@ -243,9 +282,11 @@ public class Eye extends SceneNode {
 		beta = Methods.bound(db + beta, -Math.PI, 0);
 		spin += ds;
 
-		da *= 0.97;
-		db *= 0.97;
-		ds *= 0.97;
+		double f = Math.pow(0.97, 1 / speed);
+
+		da *= f;
+		db *= f;
+		ds *= f;
 
 		sunDir.incrementAngle(0.01);
 	}

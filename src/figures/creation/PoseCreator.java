@@ -83,7 +83,6 @@ public class PoseCreator extends JPanel implements MouseListener,
 
 	public void paintComponent(Graphics gr) {
 		eye.synchronize();
-		System.out.println("START PAINTING");
 
 		super.paintComponent(gr);
 
@@ -157,7 +156,6 @@ public class PoseCreator extends JPanel implements MouseListener,
 					Math.abs(currMouseX - beginPressX),
 					Math.abs(currMouseY - beginPressY));
 		}
-		System.out.println("END PAINTING");
 	}
 
 	private void paintFigure(Graphics g, FigPose toDraw, ColorScheme cs) {

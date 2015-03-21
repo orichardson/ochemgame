@@ -1,6 +1,8 @@
 
 package math;
 
+import java.text.DecimalFormat;
+
 public class Matrix {
 	double[][] entries;// row, column
 
@@ -102,18 +104,19 @@ public class Matrix {
 
 	public String toString() {
 		StringBuilder str = new StringBuilder();
+		DecimalFormat df = new DecimalFormat(".##");
 
 		for (int i = 0; i < getRows(); i++) {
 			for (int j = 0; j < getColumns(); j++) {
-				str.append(entries[i][j]);
+				str.append(df.format(entries[i][j]));
 				if (j != getColumns() - 1)
-					str.append("\t");
+					str.append(",\t");
 			}
 			if (i != getRows() - 1)
-				str.append("}\n{");
+				str.append("},\n{");
 		}
 
-		return "{" + str.toString() + "};";
+		return "\n{{" + str.toString() + "}}";
 	}
 
 	public static Matrix createID(int dim) {

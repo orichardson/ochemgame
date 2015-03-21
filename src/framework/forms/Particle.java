@@ -1,6 +1,6 @@
-
 package framework.forms;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 
@@ -11,6 +11,10 @@ import framework.Eye;
 import framework.SceneNode;
 
 public class Particle extends SceneNode {
+	private static int nparticles = 0;
+
+	int id;
+
 	public Vector3D pos;
 	Vector3D velo;
 	public Color color;
@@ -34,6 +38,7 @@ public class Particle extends SceneNode {
 		this.target = (int) (Math.random() * f.getSize());
 
 		fuzz = 0.1;
+		id = nparticles++;
 
 		this.color = Color.white;
 	}
@@ -61,9 +66,11 @@ public class Particle extends SceneNode {
 		} else {
 			velo.scale(0.99);
 
-			velo = Vector3D.meld(f.clone().scale(veloTransform(d2)), velo, Math.pow(fuzz, 0.2)); // velo
-																									// only
-			velo.add(f.clone().scale(veloTransform(d2)).scale( (fuzz) * 0.01)); // acceleration only
+			velo =
+					Vector3D.meld(f.clone().scale(veloTransform(d2)), velo,
+							Math.pow(fuzz, 0.2)); // velo
+													// only
+			velo.add(f.clone().scale(veloTransform(d2)).scale((fuzz) * 0.01)); // acceleration only
 
 			velo.add(Vector3D.random(0.001 * fuzz));
 
@@ -85,7 +92,7 @@ public class Particle extends SceneNode {
 		return 0.01 * speed * (10 * d * d + 1);
 	}
 
-//	private Vector3D last;
+	private Vector3D last;
 
 	@Override
 	public void draw(Graphics2D g, Eye e) {
@@ -97,15 +104,16 @@ public class Particle extends SceneNode {
 			g.setColor(e.transform(color, velo.cross(m.applyTo(pos)), 0));
 			g.fillRect((int) v.x - r, (int) v.y - r, (r * 2 + 1), (r * 2 + 1));
 
-//			if (last != null) {
-//				Vector3D v2 = e.toScreenDepthBufferUpdate(m.applyTo(last), size);
-//				if (v2 != null) {
-//					g.setStroke(new BasicStroke(r * 2));
-//					g.drawLine((int) v.x, (int) v.y, (int) v2.x, (int) v2.y);
-//				}
-//			}
+			if (last != null) {
+				Vector3D v2 =
+						e.toScreenDepthBufferUpdate(m.applyTo(last), size);
+				if (v2 != null) {
+					g.setStroke(new BasicStroke(r * 2));
+					g.drawLine((int) v.x, (int) v.y, (int) v2.x, (int) v2.y);
+				}
+			}
 		}
 
-//		last = pos.clone();
+		last = pos.clone();
 	}
 }

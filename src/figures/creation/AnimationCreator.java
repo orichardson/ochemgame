@@ -288,9 +288,6 @@ public class AnimationCreator extends JPanel implements ActionListener, ChangeLi
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			System.out.println("UPDATE");
-
-			
 
 			//TODO: ???
 //			if (ps.running)
