@@ -13,6 +13,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.swing.JPanel;
 
@@ -60,7 +61,7 @@ public class PoseCreator extends JPanel implements MouseListener, MouseMotionLis
 
 	// / END VARIABLES
 
-	// private ReentrantLock lock = new ReentrantLock();
+	private ReentrantLock lock = new ReentrantLock();
 
 	public PoseCreator(HashSet<Integer> k) {
 		setBackground(Color.BLACK);
@@ -88,9 +89,9 @@ public class PoseCreator extends JPanel implements MouseListener, MouseMotionLis
 
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-		// lock.lock();
+		lock.lock();
 		eye.synchronize();
-		// lock.unlock();
+		lock.unlock();
 
 		// ******************************************* DRAW AXES *******************************
 		Vector3D piece1 = eye.toScreen(new Vector3D(1, -1, 0));
@@ -206,7 +207,7 @@ public class PoseCreator extends JPanel implements MouseListener, MouseMotionLis
 				if (figure.struct.ptsizes[i] > 0) {
 					int w = eye.sphereWidth(toDraw.pos[i], figure.struct.ptsizes[i]);
 					if (xpoints[i] != -1) {
-						g.setColor(cs.get(selected.contains(i)?"SELECTED":"UNSELECTED"));
+						g.setColor(cs.get(selected.contains(i) ? "SELECTED" : "UNSELECTED"));
 						g.drawOval(xpoints[i] - w, ypoints[i] - w, 2 * w, 2 * w);
 					}
 				}
@@ -259,6 +260,7 @@ public class PoseCreator extends JPanel implements MouseListener, MouseMotionLis
 	}
 
 	public void update(boolean orthoS, boolean followS, int value) {
+		lock.lock();
 		if (keys.contains(KeyEvent.VK_RIGHT))
 			eye.alpha -= 0.03;
 		if (keys.contains(KeyEvent.VK_LEFT))
@@ -300,6 +302,7 @@ public class PoseCreator extends JPanel implements MouseListener, MouseMotionLis
 			eye.updatePosition();
 			eye.update(null, 1.0);
 		}
+		lock.unlock();
 	}
 
 	public void mouseMoved(MouseEvent evt) {
