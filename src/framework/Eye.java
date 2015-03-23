@@ -166,7 +166,8 @@ public class Eye extends SceneNode {
 	public Vector3D toScreen(Vector3D v) {
 		if (v == null)
 			return null;
-		Vector3D raw = rotator.applyTo(v.sub(pos_synced));
+		//always use protection
+		Vector3D raw = rotator.applyTo(v.clone().sub(pos_synced));
 		if (raw.z > -0.5)
 			return null;
 
@@ -184,7 +185,8 @@ public class Eye extends SceneNode {
 		if (v == null)
 			return null;
 
-		Vector3D raw = rotator.applyTo(v.sub(pos_synced));
+		//always use protection.
+		Vector3D raw = rotator.applyTo(v.clone().sub(pos_synced));
 		raw.z = -raw.z;
 
 		if (raw.z <= 0)

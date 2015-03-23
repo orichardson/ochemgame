@@ -11,7 +11,7 @@ public class ColorScheme extends HashMap<String, Color> {
 	public static ColorScheme createActive() {
 		ColorScheme cs = new ColorScheme();
 		
-		cs.put("SELECT", new Color(255, 150, 0));
+		cs.put("SELECTED", new Color(255, 150, 0));
 		cs.put("SELECTED_TRANSLUCENT", new Color(255, 150, 0, 100));
 		cs.put("UNSELECTED", Color.GRAY);
 		cs.put("CLOSE_POINT", Color.WHITE);
@@ -24,7 +24,7 @@ public class ColorScheme extends HashMap<String, Color> {
 	public static ColorScheme createFaded(double prc) {
 		ColorScheme cs = new ColorScheme();
 		
-		cs.put("SELECT", Methods.colorMeld(new Color(140, 70, 70), new Color(0, 0, 0,
+		cs.put("SELECTED", Methods.colorMeld(new Color(140, 70, 70), new Color(0, 0, 0,
 				0), prc));
 		cs.put("SELECTED_TRANSLUCENT", new Color(255, 150, 0, 100));
 		cs.put("UNSELECTED", Methods.colorMeld(new Color(70, 70, 140), new Color(0, 0, 0,

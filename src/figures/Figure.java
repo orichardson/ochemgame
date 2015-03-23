@@ -17,6 +17,7 @@ public class Figure {
 
 	public Figure(FigStructure fs) {
 		this.struct = fs;
+		this.pose = fs.defaultPose.clone();
 	}
 
 	public void update(double s) {

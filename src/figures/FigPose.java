@@ -35,12 +35,14 @@ public class FigPose {
 		return meld;
 	}
 
-	public static FigPose cubicMeld(FigPose p1, FigPose p2, FigPose p0, FigPose p3, double t1, double t2, double prc) {
+	public static FigPose cubicMeld(FigPose p1, FigPose p2, FigPose p0, FigPose p3, double t1,
+			double t2, double prc) {
 		// assume p1 and p2 have same npoints, for speed.
 		FigPose meld = new FigPose(p1.FIG_PTS);
 
 		for (int i = 0; i < p1.FIG_PTS; i++)
-			meld.pos[i] = Vector3D.meldCubic(p1.pos[i], p2.pos[i], p0.pos[i], p3.pos[i], t1, t2, prc);
+			meld.pos[i] = Vector3D.meldCubic(p1.pos[i], p2.pos[i], p0.pos[i], p3.pos[i], t1, t2,
+					prc);
 
 		return meld;
 	}
@@ -50,7 +52,6 @@ public class FigPose {
 		FigPose pose = new FigPose(split.length);
 
 		for (int i = 0; i < split.length; i++) {
-			System.out.println(split[i]);
 			pose.pos[i] = Vector3D.unpack(split[i]);
 		}
 

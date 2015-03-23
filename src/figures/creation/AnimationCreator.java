@@ -1,3 +1,4 @@
+
 package figures.creation;
 
 import java.awt.BorderLayout;
@@ -29,7 +30,8 @@ import javax.swing.event.ChangeListener;
 
 import figures.Figure;
 
-public class AnimationCreator extends JPanel implements ActionListener, ChangeListener, Runnable, KeyListener {
+public class AnimationCreator extends JPanel implements ActionListener, ChangeListener, Runnable,
+		KeyListener {
 	private static final long serialVersionUID = 3997801619703816644L;
 
 	HashSet<Integer> keys = new HashSet<Integer>();
@@ -64,8 +66,7 @@ public class AnimationCreator extends JPanel implements ActionListener, ChangeLi
 	JCheckBox followSelection = new JCheckBox("Follow Selection");
 
 	/**
-	 * Checkbox following selection
-	 * Input Focus point (XYZ)
+	 * Checkbox following selection Input Focus point (XYZ)
 	 * 
 	 */
 
@@ -77,7 +78,6 @@ public class AnimationCreator extends JPanel implements ActionListener, ChangeLi
 	JCheckBox preserve = new JCheckBox("Rigid Bones");
 	AnimTimePanel timeline;
 	PoseCreator ps;
-
 
 	public AnimationCreator() throws IllegalArgumentException, IllegalAccessException {
 		ps = new PoseCreator(keys);
@@ -122,8 +122,8 @@ public class AnimationCreator extends JPanel implements ActionListener, ChangeLi
 		speedSlide.setPreferredSize(new Dimension(120, 25));
 		distSlide.setPreferredSize(new Dimension(120, 25));
 
-		JPanel p1 = new JPanel(new FlowLayout(FlowLayout.CENTER, 2, 2)), p2 = new JPanel(new FlowLayout(
-				FlowLayout.CENTER, 2, 2)), p3 = new JPanel(), p4 = new JPanel();
+		JPanel p1 = new JPanel(new FlowLayout(FlowLayout.CENTER, 2, 2)), p2 = new JPanel(
+				new FlowLayout(FlowLayout.CENTER, 2, 2)), p3 = new JPanel(), p4 = new JPanel();
 		p1.setOpaque(false);
 		p2.setOpaque(false);
 		p3.setOpaque(false);
@@ -201,7 +201,7 @@ public class AnimationCreator extends JPanel implements ActionListener, ChangeLi
 		} else if (evt.getSource() == load) {
 			JFileChooser chooser = new JFileChooser();
 			chooser.setCurrentDirectory(new File(System.getProperty("user.dir"), "Resources"));
-			
+
 			chooser.setFileFilter(new javax.swing.filechooser.FileFilter() {
 				public boolean accept(File f) {
 					return (f.getName().endsWith(".fig") || f.isDirectory());
@@ -211,20 +211,20 @@ public class AnimationCreator extends JPanel implements ActionListener, ChangeLi
 					return "Figure (.fig)";
 				}
 			});
-			
+
 			int r = chooser.showOpenDialog(this);
 			if (r == JFileChooser.APPROVE_OPTION) {
 				Figure newFig = Figure.fromFile(chooser.getSelectedFile().getAbsolutePath());
-//				ps.anim = ga;
-//				ps.poses = ga.poses;
-//				ps.figure.current_anim = ga;
+				// ps.anim = ga;
+				// ps.poses = ga.poses;
+				// ps.figure.current_anim = ga;
 
 				ps.current = 0;
 				ps.selected.clear();
 				ps.figure = newFig;
 				ps.xpoints = new int[newFig.struct.NPTS];
 				ps.ypoints = new int[newFig.struct.NPTS];
-//				speedSlide.setValue((int) (10 * Math.log(ga.speed) / Math.log(2)));
+				// speedSlide.setValue((int) (10 * Math.log(ga.speed) / Math.log(2)));
 			}
 		} else if (evt.getSource() == save) {
 			JFileChooser chooser = new JFileChooser(ps.figure.getFileName());
@@ -241,10 +241,10 @@ public class AnimationCreator extends JPanel implements ActionListener, ChangeLi
 			int r = chooser.showSaveDialog(this);
 			if (r == JFileChooser.APPROVE_OPTION) {
 				String dir = chooser.getSelectedFile().getAbsolutePath();
-				if (!(dir.endsWith(".fig")))
+				if (! (dir.endsWith(".fig")))
 					dir += ".fig";
 			}
-			
+
 			ps.figure.saveToFile();
 
 		}
@@ -289,9 +289,9 @@ public class AnimationCreator extends JPanel implements ActionListener, ChangeLi
 				e.printStackTrace();
 			}
 
-			//TODO: ???
-//			if (ps.running)
-//				ps.current = ps.figure.update(0.05, 0) % ps.poses.size();
+			// TODO: ???
+			// if (ps.running)
+			// ps.current = ps.figure.update(0.05, 0) % ps.poses.size();
 
 			timeline.update();
 			update();
@@ -300,44 +300,8 @@ public class AnimationCreator extends JPanel implements ActionListener, ChangeLi
 	}
 
 	public void update() {
-		if (keys.contains(KeyEvent.VK_RIGHT))
-			ps.eye.alpha -= 0.03;
-		if (keys.contains(KeyEvent.VK_LEFT))
-			ps.eye.alpha += 0.03;
-		if (keys.contains(KeyEvent.VK_DOWN))
-			if (ps.eye.beta < 0)
-				ps.eye.beta += 0.02;
-			else ps.eye.beta = 0;
-		if (keys.contains(KeyEvent.VK_UP))
-			if (ps.eye.beta > -Math.PI)
-				ps.eye.beta -= 0.02;
-			else ps.eye.beta = -Math.PI;
-
-		if (keys.contains(KeyEvent.VK_NUMPAD7)) {
-			ps.eye.alpha += (0 - ps.eye.alpha) / 3;
-			ps.eye.beta += (0 - ps.eye.beta) / 3;
-		} else if (keys.contains(KeyEvent.VK_NUMPAD1)) {
-			ps.eye.alpha += (0 - ps.eye.alpha) / 3;
-			ps.eye.beta += (-Math.PI / 2 - ps.eye.beta) / 3;
-		} else if (keys.contains(KeyEvent.VK_NUMPAD3)) {
-			ps.eye.alpha += (-Math.PI / 2 - ps.eye.alpha) / 3;
-			ps.eye.beta += (-Math.PI / 2 - ps.eye.beta) / 3;
-		}
-
-		ps.eye.setScreen(getWidth(), getHeight());
-
-		if (orthographic.isSelected())
-			ps.eye.ortho += (1 - ps.eye.ortho) / 10;
-		else ps.eye.ortho += -ps.eye.ortho / 10;
-
-		ps.eye.leash += (distSlide.getValue() / 10D - ps.eye.leash) / 5;
-
+		ps.update(orthographic.isSelected(), followSelection.isSelected(), distSlide.getValue());
 		ind.setText(" Frame " + ps.current + " ");
-		if (ps.moveMode == -1) {
-			if (followSelection.isSelected() && ps.midpoint != null)
-				ps.eye.focusApproach(ps.midpoint, 1);
-			ps.eye.update(null, 1.0);
-		}
 	}
 
 	public void enableButtons(boolean x) {
@@ -398,7 +362,8 @@ public class AnimationCreator extends JPanel implements ActionListener, ChangeLi
 
 		if (evt.getKeyCode() == KeyEvent.VK_NUMPAD5) {
 			orthographic.setSelected(!orthographic.isSelected());
-			actionPerformed(new ActionEvent(orthographic, ActionEvent.ACTION_PERFORMED, "toggle ortho"));
+			actionPerformed(new ActionEvent(orthographic, ActionEvent.ACTION_PERFORMED,
+					"toggle ortho"));
 		}
 		ps.keyPress(evt.getKeyCode());
 	}

@@ -1,3 +1,4 @@
+
 package figures.creation;
 
 import java.awt.BasicStroke;
@@ -23,8 +24,7 @@ import figures.FigPose;
 import figures.Figure;
 import framework.Eye;
 
-public class PoseCreator extends JPanel implements MouseListener,
-		MouseMotionListener {
+public class PoseCreator extends JPanel implements MouseListener, MouseMotionListener {
 	private static final long serialVersionUID = -8293452421327152836L;
 
 	// ************* Variables ***************
@@ -37,8 +37,7 @@ public class PoseCreator extends JPanel implements MouseListener,
 	Eye eye = new Eye(null, new Dimension(1100, 800));
 
 	boolean running = false;
-	public int[] xpoints = new int[figure.struct.NPTS],
-			ypoints = new int[figure.struct.NPTS];
+	public int[] xpoints = new int[figure.struct.NPTS], ypoints = new int[figure.struct.NPTS];
 
 	int current = 0, moveMode = -1;
 	/**
@@ -51,8 +50,7 @@ public class PoseCreator extends JPanel implements MouseListener,
 	// ******************** Movement and Selection vars* ******
 
 	FigPose frozen = null;
-	int beginPressX = -1, beginPressY = -1, currMouseX, currMouseY,
-			actualizeX = -1,
+	int beginPressX = -1, beginPressY = -1, currMouseX, currMouseY, actualizeX = -1,
 			actualizeY = -1;
 	Vector3D midpoint = null;
 
@@ -62,6 +60,8 @@ public class PoseCreator extends JPanel implements MouseListener,
 
 	// / END VARIABLES
 
+	// private ReentrantLock lock = new ReentrantLock();
+
 	public PoseCreator(HashSet<Integer> k) {
 		setBackground(Color.BLACK);
 		eye.leash = 4;
@@ -70,7 +70,7 @@ public class PoseCreator extends JPanel implements MouseListener,
 
 		eye.beta = -3 * Math.PI / 8;
 
-		eye.focus = new Vector3D(0, 0, 0.6);
+		eye.focus = new Vector3D(0, 0, 1);
 		eye.update(null, 1.0);
 
 		figure.setAnimation(anim);
@@ -82,14 +82,15 @@ public class PoseCreator extends JPanel implements MouseListener,
 	}
 
 	public void paintComponent(Graphics gr) {
-		eye.synchronize();
-
 		super.paintComponent(gr);
 
 		Graphics2D g = (Graphics2D) gr;
 
-		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-				RenderingHints.VALUE_ANTIALIAS_ON);
+		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+		// lock.lock();
+		eye.synchronize();
+		// lock.unlock();
 
 		// ******************************************* DRAW AXES *******************************
 		Vector3D piece1 = eye.toScreen(new Vector3D(1, -1, 0));
@@ -102,24 +103,21 @@ public class PoseCreator extends JPanel implements MouseListener,
 			g.setStroke(new BasicStroke(lockX ? 10 : 4));
 
 			g.setColor(new Color(150, 100, 100));
-			g.drawLine(eye.psX(base.x), eye.psY(base.y), eye.psX(piece1.x),
-					eye.psY(piece1.y));
+			g.drawLine(eye.psX(base.x), eye.psY(base.y), eye.psX(piece1.x), eye.psY(piece1.y));
 			g.drawString("+x", eye.psX(piece1.x), eye.psY(piece1.y));
 		}
 		if (piece2 != null && base != null) {
 			g.setStroke(new BasicStroke(lockY ? 10 : 4));
 
 			g.setColor(new Color(100, 150, 100));
-			g.drawLine(eye.psX(base.x), eye.psY(base.y), eye.psX(piece2.x),
-					eye.psY(piece2.y));
+			g.drawLine(eye.psX(base.x), eye.psY(base.y), eye.psX(piece2.x), eye.psY(piece2.y));
 			g.drawString("+y", eye.psX(piece2.x), eye.psY(piece2.y));
 		}
 		if (piece3 != null && base != null) {
 			g.setStroke(new BasicStroke(lockZ ? 10 : 4));
 
 			g.setColor(new Color(100, 100, 150));
-			g.drawLine(eye.psX(base.x), eye.psY(base.y), eye.psX(piece3.x),
-					eye.psY(piece3.y));
+			g.drawLine(eye.psX(base.x), eye.psY(base.y), eye.psX(piece3.x), eye.psY(piece3.y));
 			g.drawString("+z", eye.psX(piece3.x), eye.psY(piece3.y));
 		}
 		if (origin != null) {
@@ -129,13 +127,12 @@ public class PoseCreator extends JPanel implements MouseListener,
 		g.setStroke(new BasicStroke(1));
 
 		// ************************ DRAW MOTION BLUR ************************
-		if (!running) {
-			for (int h = 1; h < 5; h++) {
-				FigPose prevPose = poses.get((h * poses.size() + current - h)
-						% poses.size());
-				paintFigure(g, prevPose, ColorScheme.createFaded(h / 5D));
-			}
-		}
+		// if (!running) {
+		// for (int h = 1; h < 5; h++) {
+		// FigPose prevPose = poses.get( (h * poses.size() + current - h) % poses.size());
+		// paintFigure(g, prevPose, ColorScheme.createFaded(h / 5D));
+		// }
+		// }
 
 		// ************* NOW draw current pose *****************************
 		FigPose toDraw = (running ? figure.pose : poses.get(current));
@@ -145,16 +142,12 @@ public class PoseCreator extends JPanel implements MouseListener,
 		if (beginPressX > 0 || beginPressY > 0) {
 			g.setColor(new Color(255, 150, 0, 30));
 
-			g.fillRect(Math.min(beginPressX, currMouseX),
-					Math.min(beginPressY, currMouseY),
-					Math.abs(currMouseX - beginPressX),
-					Math.abs(currMouseY - beginPressY));
+			g.fillRect(Math.min(beginPressX, currMouseX), Math.min(beginPressY, currMouseY),
+					Math.abs(currMouseX - beginPressX), Math.abs(currMouseY - beginPressY));
 			g.setColor(new Color(255, 150, 0));
 
-			g.drawRect(Math.min(beginPressX, currMouseX),
-					Math.min(beginPressY, currMouseY),
-					Math.abs(currMouseX - beginPressX),
-					Math.abs(currMouseY - beginPressY));
+			g.drawRect(Math.min(beginPressX, currMouseX), Math.min(beginPressY, currMouseY),
+					Math.abs(currMouseX - beginPressX), Math.abs(currMouseY - beginPressY));
 		}
 	}
 
@@ -181,7 +174,7 @@ public class PoseCreator extends JPanel implements MouseListener,
 		}
 
 		// ... draw the lines,
-		for (int i = 0; i < figure.struct.lengths.length; i++) {
+		for (int i = 0; i < figure.struct.NLINES; i++) {
 			if (xpoints[figure.struct.line1[i]] != -1) {
 				if (selected.contains(figure.struct.line1[i])
 						&& selected.contains(figure.struct.line2[i]))
@@ -189,10 +182,8 @@ public class PoseCreator extends JPanel implements MouseListener,
 				else
 					g.setColor(cs.get("UNSELECTED"));
 
-				g.drawLine(xpoints[figure.struct.line1[i]],
-						ypoints[figure.struct.line1[i]],
-						xpoints[figure.struct.line2[i]],
-						ypoints[figure.struct.line2[i]]);
+				g.drawLine(xpoints[figure.struct.line1[i]], ypoints[figure.struct.line1[i]],
+						xpoints[figure.struct.line2[i]], ypoints[figure.struct.line2[i]]);
 			}
 		}
 
@@ -201,32 +192,28 @@ public class PoseCreator extends JPanel implements MouseListener,
 			int r = running ? 1 : 8;
 			if (xpoints[i] != -1) {
 				// draw interior of circle
-				g.setColor(selected.contains(i) ? cs
-						.get("SELECTED_TRANSLUCENT") : //
-						Methods.colorMeld(cs.get("CLOSE_POINT"),
-								cs.get("FAR_POINT"),
-								(distances[i] - minDist + .05)
-										/ (maxDist - minDist + .10), 100));
+				g.setColor(selected.contains(i) ? cs.get("SELECTED_TRANSLUCENT") : //
+						Methods.colorMeld(cs.get("CLOSE_POINT"), cs.get("FAR_POINT"), (distances[i]
+								- minDist + .05)
+								/ (maxDist - minDist + .10), 100));
 				g.fillOval(xpoints[i] - r, ypoints[i] - r, 2 * r, 2 * r);
 
 				// draw exterior of circle
-				g.setColor(selected.contains(i) ? cs.get("SELECTED") : cs
-						.get("BACKGROUND"));
+				g.setColor(selected.contains(i) ? cs.get("SELECTED") : cs.get("BACKGROUND"));
 				g.drawOval(xpoints[i] - r, ypoints[i] - r, 2 * r, 2 * r);
 
 				// for all positive radius points, draw concentric circle
 				if (figure.struct.ptsizes[i] > 0) {
-					int w =
-							eye.sphereWidth(toDraw.pos[i],
-									figure.struct.ptsizes[i]);
-					if (xpoints[i] != -1)
+					int w = eye.sphereWidth(toDraw.pos[i], figure.struct.ptsizes[i]);
+					if (xpoints[i] != -1) {
+						g.setColor(cs.get(selected.contains(i)?"SELECTED":"UNSELECTED"));
 						g.drawOval(xpoints[i] - w, ypoints[i] - w, 2 * w, 2 * w);
+					}
 				}
 
 			}
 		}
 	}
-
 	public void keyPress(int key) {
 		if (key == KeyEvent.VK_G) {
 			actualizeX = currMouseX;
@@ -271,36 +258,72 @@ public class PoseCreator extends JPanel implements MouseListener,
 		}
 	}
 
+	public void update(boolean orthoS, boolean followS, int value) {
+		if (keys.contains(KeyEvent.VK_RIGHT))
+			eye.alpha -= 0.03;
+		if (keys.contains(KeyEvent.VK_LEFT))
+			eye.alpha += 0.03;
+		if (keys.contains(KeyEvent.VK_DOWN))
+			if (eye.beta < 0)
+				eye.beta += 0.02;
+			else
+				eye.beta = 0;
+		if (keys.contains(KeyEvent.VK_UP))
+			if (eye.beta > -Math.PI)
+				eye.beta -= 0.02;
+			else
+				eye.beta = -Math.PI;
+
+		if (keys.contains(KeyEvent.VK_NUMPAD7)) {
+			eye.alpha += (0 - eye.alpha) / 3;
+			eye.beta += (0 - eye.beta) / 3;
+		} else if (keys.contains(KeyEvent.VK_NUMPAD1)) {
+			eye.alpha += (0 - eye.alpha) / 3;
+			eye.beta += (-Math.PI / 2 - eye.beta) / 3;
+		} else if (keys.contains(KeyEvent.VK_NUMPAD3)) {
+			eye.alpha += (-Math.PI / 2 - eye.alpha) / 3;
+			eye.beta += (-Math.PI / 2 - eye.beta) / 3;
+		}
+
+		eye.setScreen(getWidth(), getHeight());
+
+		if (orthoS)
+			eye.ortho += (1 - eye.ortho) / 10;
+		else
+			eye.ortho += -eye.ortho / 10;
+
+		eye.leash += (value / 10D - eye.leash) / 5;
+
+		if (moveMode == -1) {
+			if (followS && midpoint != null)
+				eye.focusApproach(midpoint, 1);
+			eye.updatePosition();
+			eye.update(null, 1.0);
+		}
+	}
+
 	public void mouseMoved(MouseEvent evt) {
 		if (!selected.isEmpty() && frozen != null) {
-			boolean locked = !(lockX || lockY || lockZ);
+			boolean locked = ! (lockX || lockY || lockZ);
 			if (moveMode == 0) {
 				for (int select : selected) {
 					double d = eye.faceDist(frozen.pos[select]);
 					Vector3D v = eye.pickDist(evt.getX(), evt.getY(), d)
-							.sub(eye.pickDist(actualizeX, actualizeY, d))
-							.add(frozen.pos[select]);
-					poses.get(current).pos[select].set(v, locked || lockX,
-							locked || lockY,
-							locked || lockZ);
+							.sub(eye.pickDist(actualizeX, actualizeY, d)).add(frozen.pos[select]);
+					poses.get(current).pos[select].set(v, locked || lockX, locked || lockY, locked
+							|| lockZ);
 					calculateMidpoint();
 				}
 			} else if (moveMode == 1) {
 				for (int select : selected) {
 					double d = eye.faceDist(frozen.pos[select]);
-					double factor =
-							eye.pickDist(evt.getX(), evt.getY(), d)
-									.sub(midpoint)
-									.magnitude()
-									/ eye.pickDist(actualizeX, actualizeY, d)
-											.sub(midpoint).magnitude();
-					Vector3D v =
-							(frozen.pos[select].clone().sub(midpoint)).scale(
-									factor)
-									.add(midpoint);
-					poses.get(current).pos[select].set(v, locked || lockX,
-							locked || lockY,
-							locked || lockZ);
+					double factor = eye.pickDist(evt.getX(), evt.getY(), d).sub(midpoint)
+							.magnitude()
+							/ eye.pickDist(actualizeX, actualizeY, d).sub(midpoint).magnitude();
+					Vector3D v = (frozen.pos[select].clone().sub(midpoint)).scale(factor).add(
+							midpoint);
+					poses.get(current).pos[select].set(v, locked || lockX, locked || lockY, locked
+							|| lockZ);
 				}
 			} else if (moveMode == 2) {
 				for (int select : selected) {
@@ -310,16 +333,11 @@ public class PoseCreator extends JPanel implements MouseListener,
 							evt.getX() - eye.psX(screenmp.x))
 							- Math.atan2(actualizeY - eye.psY(screenmp.y),
 									actualizeX - eye.psX(screenmp.x));
-					Vector3D v =
-							Matrix
-									.createArbitraryRotationMatrix(angle,
-											eye.calculateDirection())
-									.applyTo(
-											frozen.pos[select].clone().sub(
-													midpoint)).add(midpoint);
-					poses.get(current).pos[select].set(v, locked || lockX,
-							locked || lockY,
-							locked || lockZ);
+					Vector3D v = Matrix
+							.createArbitraryRotationMatrix(angle, eye.calculateDirection())
+							.applyTo(frozen.pos[select].clone().sub(midpoint)).add(midpoint);
+					poses.get(current).pos[select].set(v, locked || lockX, locked || lockY, locked
+							|| lockZ);
 				}
 			}
 		}
@@ -342,10 +360,8 @@ public class PoseCreator extends JPanel implements MouseListener,
 		} else {
 			int mx = evt.getX(), my = evt.getY();
 			for (int i = 0; i < xpoints.length; i++) {
-				if ((xpoints[i] - mx) * (xpoints[i] - mx) + (ypoints[i] - my)
-						* (ypoints[i] - my) < 8 * 8) {
-					if (!(keys.contains(KeyEvent.VK_CONTROL) || keys
-							.contains(KeyEvent.VK_SHIFT)))
+				if ( (xpoints[i] - mx) * (xpoints[i] - mx) + (ypoints[i] - my) * (ypoints[i] - my) < 8 * 8) {
+					if (! (keys.contains(KeyEvent.VK_CONTROL) || keys.contains(KeyEvent.VK_SHIFT)))
 						selected.clear();
 					if (keys.contains(KeyEvent.VK_SHIFT))
 						selected.remove(i);
@@ -368,14 +384,11 @@ public class PoseCreator extends JPanel implements MouseListener,
 	}
 
 	public void mouseReleased(MouseEvent evt) {
-		int minx = Math.min(beginPressX, currMouseX), maxx =
-				Math.max(beginPressX, currMouseX), miny = Math
-				.min(beginPressY, currMouseY), maxy =
-				Math.max(beginPressY, currMouseY);
+		int minx = Math.min(beginPressX, currMouseX), maxx = Math.max(beginPressX, currMouseX), miny = Math
+				.min(beginPressY, currMouseY), maxy = Math.max(beginPressY, currMouseY);
 
-		if ((minx - maxx) * (minx - maxx) + (miny - maxy) * (miny - maxy) > 200) {
-			if (!(keys.contains(KeyEvent.VK_CONTROL) || keys
-					.contains(KeyEvent.VK_SHIFT)))
+		if ( (minx - maxx) * (minx - maxx) + (miny - maxy) * (miny - maxy) > 200) {
+			if (! (keys.contains(KeyEvent.VK_CONTROL) || keys.contains(KeyEvent.VK_SHIFT)))
 				selected.clear();
 			for (int i = 0; i < xpoints.length; i++) {
 				if (xpoints[i] > minx && xpoints[i] < maxx && ypoints[i] > miny
