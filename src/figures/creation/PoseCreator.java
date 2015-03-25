@@ -415,9 +415,11 @@ public class PoseCreator extends JPanel implements MouseListener, MouseMotionLis
 		currMouseY = evt.getY();
 		if (evt.isMetaDown()) {
 			int dx = evt.getX() - beginPressX, dy = evt.getY() - beginPressY;
+			
 			eye.alpha -= dx / 100d;
 			eye.beta += dy / 100d;
 			eye.beta = Math.min(Math.max(-Math.PI, eye.beta), 0);
+			eye.updatePosition();
 
 			beginPressX = evt.getX();
 			beginPressY = evt.getY();
