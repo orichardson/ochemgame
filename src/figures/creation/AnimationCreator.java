@@ -67,7 +67,6 @@ public class AnimationCreator extends JPanel implements ActionListener, ChangeLi
 
 	/**
 	 * Checkbox following selection Input Focus point (XYZ)
-	 * 
 	 */
 
 	JButton help = new JButton("Help");
@@ -103,6 +102,8 @@ public class AnimationCreator extends JPanel implements ActionListener, ChangeLi
 				b.setFocusable(false);
 			}
 		}
+
+		distSlide.addChangeListener(this);
 
 		orthographic.setFocusable(false);
 		speedSlide.setFocusable(false);
@@ -272,8 +273,11 @@ public class AnimationCreator extends JPanel implements ActionListener, ChangeLi
 
 	@Override
 	public void stateChanged(ChangeEvent evt) {
-		if (evt.getSource() == speedSlide)
-			ps.anim.speed = Math.pow(2, speedSlide.getValue() / 10D);
+		if (evt.getSource() == distSlide) {
+			ps.leashTo = distSlide.getValue() / 10D;
+		} else if (evt.getSource() == speedSlide)
+			; // TODO
+				// ps.anim.speed = Math.pow(2, speedSlide.getValue() / 10D);
 	}
 
 	public void moveFrame(int n) {
@@ -300,7 +304,8 @@ public class AnimationCreator extends JPanel implements ActionListener, ChangeLi
 	}
 
 	public void update() {
-		ps.update(orthographic.isSelected(), followSelection.isSelected(), distSlide.getValue());
+		distSlide.setValue((int) (10 * ps.leashTo));
+		ps.update(orthographic.isSelected(), followSelection.isSelected());
 		ind.setText(" Frame " + ps.current + " ");
 	}
 

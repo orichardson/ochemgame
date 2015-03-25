@@ -1,3 +1,4 @@
+
 package framework;
 
 import game.Game;
@@ -21,9 +22,9 @@ public class Eye extends SceneNode {
 	public double scale = 1000;
 
 	// **** VARS THAT REQUIRE SYNCHRONIZATION
-	public Matrix rotator, invrotator;
-	private double ortho_synced;
-	public Vector3D pos_synced;
+	private Matrix rotator, invrotator;
+	private double ortho_synced, leash_synced;
+	private Vector3D pos_synced;
 
 	// **** Non-synchronized variables
 	public double ortho = 0; // between 0 and 1;
@@ -74,26 +75,20 @@ public class Eye extends SceneNode {
 			if (mode == 0)
 				prc = getPercent(norm.angleBetween(sunDir));
 			else if (mode == 1) {
-				prc =
-						getPercent(Math.abs(Math.PI / 2
-								- norm.angleBetween(sunDir)));
+				prc = getPercent(Math.abs(Math.PI / 2 - norm.angleBetween(sunDir)));
 			}
 		}
 
-		Color clr =
-				new Color((int) (prc * Methods.bound(last.x, 0, 255)),
-						(int) (prc * Methods.bound(last.y, 0, 255)),
-						(int) (prc * Methods.bound(last.z, 0,
-								255)), c.getAlpha());
+		Color clr = new Color((int) (prc * Methods.bound(last.x, 0, 255)),
+				(int) (prc * Methods.bound(last.y, 0, 255)), (int) (prc * Methods.bound(last.z, 0,
+						255)), c.getAlpha());
 		return clr;
 	}
 
 	public void updatePosition() {
 		pos = focus.clone().add(
-				Matrix.create3DEulerRotMatrix(spin, beta, alpha)
-						.calculateInverse()
-						.applyTo(new Vector3D(0, 0, leash))
-				);
+				Matrix.create3DEulerRotMatrix(spin, beta, alpha).calculateInverse()
+						.applyTo(new Vector3D(0, 0, leash)));
 	}
 
 	public void synchronize() {
@@ -101,9 +96,10 @@ public class Eye extends SceneNode {
 		invrotator = rotator.calculateInverse();
 		pos_synced = pos.clone();
 		ortho_synced = ortho;
+		leash_synced = leash;
 
 		if (grain > 0)
-			dmap = new double[(screen.width / grain) * (screen.height / grain)];
+			dmap = new double[ (screen.width / grain) * (screen.height / grain)];
 	}
 	public void focusApproach(Vector3D v, double factor) {
 		focus.x += (v.x - focus.x) / (factor * followK);
@@ -163,16 +159,24 @@ public class Eye extends SceneNode {
 		return e2;
 	}
 
+	/**
+	 * Note that this does minimal culling! Off-screen vectors will still be returned, because it
+	 * doesn't deal with pixels at all
+	 * 
+	 * @param v
+	 *            the world position in question
+	 * @return the rotated screen position
+	 */
 	public Vector3D toScreen(Vector3D v) {
 		if (v == null)
 			return null;
-		//always use protection
+		// always use protection
 		Vector3D raw = rotator.applyTo(v.clone().sub(pos_synced));
-		if (raw.z > -0.5)
+		if (raw.z > 0)
 			return null;
 
-		double a = raw.x / leash, b = raw.y / leash, c = -raw.x / raw.z, d =
-				-raw.y / raw.z;
+		double a = raw.x / leash_synced, b = raw.y / leash_synced, c = -raw.x / raw.z, d = -raw.y
+				/ raw.z;
 
 		return new Vector3D(c + (a - c) * ortho, d + (b - d) * ortho, -raw.z);
 	}
@@ -185,45 +189,36 @@ public class Eye extends SceneNode {
 		if (v == null)
 			return null;
 
-		//always use protection.
+		// always use protection.
 		Vector3D raw = rotator.applyTo(v.clone().sub(pos_synced));
 		raw.z = -raw.z;
 
 		if (raw.z <= 0)
 			return null;
 
-		double a = raw.x / leash, b = raw.y / leash, c = raw.x / raw.z, d =
-				raw.y / raw.z;
+		double a = raw.x / leash_synced, b = raw.y / leash_synced, c = raw.x / raw.z, d = raw.y
+				/ raw.z;
 
-		Vector3D nice =
-				new Vector3D(psX(c + (a - c) * ortho),
-						psY(d + (b - d) * ortho), size
-								/ raw.z);
+		Vector3D nice = new Vector3D(psX(c + (a - c) * ortho), psY(d + (b - d) * ortho), size
+				/ raw.z);
 
-		if (nice.x < 0 || nice.x >= screen.width || nice.y < 0
-				|| nice.y >= screen.height)
+		if (nice.x < 0 || nice.x >= screen.width || nice.y < 0 || nice.y >= screen.height)
 			return null;
 
 		if (grain > 0 && size > 0) { // only do this if there IS a depth buffer...
 			int buffer_width = screen.width / grain;
 
-			double centerDist =
-					dmap[(int) (nice.x / grain) + (int) (nice.y / grain)
-							* buffer_width];
+			double centerDist = dmap[(int) (nice.x / grain) + (int) (nice.y / grain) * buffer_width];
 
 			if (centerDist != 0 && raw.z > centerDist)
 				return null;
 
-			for (int i = Math.max((int) (nice.x - nice.z) / grain, 0); i < Math
-					.min(
-							(int) (nice.x + nice.z) / grain, buffer_width); i++)
-				for (int j = Math.max((int) (nice.y - nice.z) / grain, 0); j < Math
-						.min(
-								(int) (nice.y + nice.z) / grain, screen.height
-										/ grain); j++) {
+			for (int i = Math.max((int) (nice.x - nice.z) / grain, 0); i < Math.min(
+					(int) (nice.x + nice.z) / grain, buffer_width); i++)
+				for (int j = Math.max((int) (nice.y - nice.z) / grain, 0); j < Math.min(
+						(int) (nice.y + nice.z) / grain, screen.height / grain); j++) {
 					double dist = dmap[i + buffer_width * j];
-					dmap[i + buffer_width * j] =
-							dist == 0 ? raw.z : Math.min(dist, raw.z);
+					dmap[i + buffer_width * j] = dist == 0 ? raw.z : Math.min(dist, raw.z);
 				}
 		}
 
@@ -236,15 +231,13 @@ public class Eye extends SceneNode {
 
 	public Vector3D pickBasic(int x, int y) { // for now assume return z = 0
 		return invrotator.applyTo(
-				new Vector3D(ssX(x) * leash, ssY(y) * leash, -leash)).add(
+				new Vector3D(ssX(x) * leash_synced, ssY(y) * leash_synced, -leash_synced)).add(
 				pos_synced);
 	}
 
 	public Vector3D pickDist(int x, int y, double dist) {
-		return Vector3D.meld(
-				invrotator.applyTo(
-						new Vector3D(ssX(x) * dist, ssY(y) * dist, -dist))
-						.add(pos_synced), pickBasic(x, y), ortho_synced);
+		return Vector3D.meld(invrotator.applyTo(new Vector3D(ssX(x) * dist, ssY(y) * dist, -dist))
+				.add(pos_synced), pickBasic(x, y), ortho_synced);
 	}
 
 	/**
@@ -271,13 +264,18 @@ public class Eye extends SceneNode {
 
 	public int sphereWidth(Vector3D v, double w) {
 		double v1 = (-scale * w / rotator.applyTo(v.clone().sub(pos_synced)).z);
-		double v2 = (scale * w / leash);
+		double v2 = (scale * w / leash_synced);
 		return (int) (v1 + (v2 - v1) * ortho);
 	}
 
-	public Vector3D calculateDirection() {
-		return new Vector3D(rotator.get(2, 0), rotator.get(2, 1), rotator.get(
-				2, 2));
+	public Vector3D calcFwd() {
+		return invrotator.applyTo(0, 0, 1);
+	}
+	public Vector3D calcRight() {
+		return invrotator.applyTo(1, 0, 0);
+	}
+	public Vector3D calcUp() {
+		return invrotator.applyTo(0, 1, 0);
 	}
 
 	public void setScreen(int width, int height) {

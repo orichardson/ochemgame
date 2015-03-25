@@ -267,7 +267,7 @@ public class Vector3D {
 				v3.y, d1, d2, prc), cub_int(v1.z, v2.z, v0.z, v3.z, d1, d2, prc));
 	}
 
-	private static double cub_int(double p1, double p2, double p0, double p3, double prc) {
+	public static double cub_int(double p1, double p2, double p0, double p3, double prc) {
 		double a0, a1, x2;
 		x2 = prc * prc;
 		a0 = p3 - p2 - p0 + p1;
@@ -275,7 +275,7 @@ public class Vector3D {
 		return (a0 * x2 * prc) + a1 * x2 + (p2 - p0) * prc + p1;
 	}
 
-	private static double cub_int(double p1, double p2, double p0, double p3, double d1, double d2,
+	public static double cub_int(double p1, double p2, double p0, double p3, double d1, double d2,
 			double prc) {
 		double a0, a1, a2, x2, den1, den2, den3, den4, r, s;
 

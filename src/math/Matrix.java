@@ -146,6 +146,18 @@ public class Matrix {
 		return rslt;
 	}
 
+	public Vector3D applyTo(double... v) {
+		Vector3D rslt = new Vector3D();
+		for (int i = 0; i < getRows(); i++) {
+			double t = 0;
+			for (int j = 0; j < getColumns(); j++) {
+				t += (j > v.length ? 0 : v[j]) * entries[i][j];
+			}
+			rslt.set(i, t);
+		}
+		return rslt;
+	}
+
 	public Vector3D applyTo(Vector3D v) {
 		Vector3D rslt = new Vector3D();
 		for (int i = 0; i < getRows(); i++) {
