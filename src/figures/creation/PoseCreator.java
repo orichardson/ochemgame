@@ -58,7 +58,6 @@ public class PoseCreator extends JPanel implements MouseListener, MouseMotionLis
 	boolean lockX = false, lockY = false, lockZ = false;
 
 	HashSet<Integer> keys;
-
 	// / END VARIABLES
 
 	private ReentrantLock lock = new ReentrantLock();
@@ -72,6 +71,7 @@ public class PoseCreator extends JPanel implements MouseListener, MouseMotionLis
 		eye.beta = -3 * Math.PI / 8;
 
 		eye.focus = new Vector3D(0, 0, 1);
+		eye.updatePosition();
 		eye.update(null, 1.0);
 
 		figure.setAnimation(anim);
