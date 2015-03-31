@@ -33,6 +33,7 @@ public class PoseCreator extends JPanel implements MouseListener, MouseMotionLis
 	// ************* Variables ***************
 	Figure figure = Figure.createEmptyFigure(15);
 	Vector3D temp = new Vector3D();
+	
 	ArrayList<FigPose> poses = new ArrayList<FigPose>();
 
 	Eye eye = new Eye(null, new Dimension(1100, 800));
@@ -59,7 +60,9 @@ public class PoseCreator extends JPanel implements MouseListener, MouseMotionLis
 	boolean lockX = false, lockY = false, lockZ = false;
 
 	HashSet<Integer> keys;
-	// / END VARIABLES
+	// **************** BUTTON Variables
+	
+	
 
 	private ReentrantLock lock = new ReentrantLock();
 
@@ -76,8 +79,8 @@ public class PoseCreator extends JPanel implements MouseListener, MouseMotionLis
 		eye.updatePosition();
 
 		// TODO
-		// figure.setAnimation(anim);
-		// anim.poses = poses;
+//		 figure.setAnimation(anim);
+//		 anim.poses = poses;
 
 		this.keys = k;
 
@@ -342,6 +345,7 @@ public class PoseCreator extends JPanel implements MouseListener, MouseMotionLis
 							midpoint);
 					poses.get(current).pos[select].set(v, locked || lockX, locked || lockY, locked
 							|| lockZ);
+					poses.get(current).sizes[select] = factor*frozen.sizes[select];
 				}
 			} else if (moveMode == 2) {
 				for (int select : selected) {

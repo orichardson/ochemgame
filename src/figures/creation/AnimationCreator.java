@@ -294,8 +294,8 @@ public class AnimationCreator extends JPanel implements ActionListener, ChangeLi
 			}
 
 			// TODO: ???
-			// if (ps.running)
-			// ps.current = ps.figure.update(0.05, 0) % ps.poses.size();
+			if (ps.running)
+				ps.current = (int) (ps.figure.update(0.05)) % ps.poses.size();
 
 			timeline.update();
 			update();

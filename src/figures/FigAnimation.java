@@ -20,7 +20,7 @@ public class FigAnimation {
 		return currentPose;
 	}
 
-	public void update(double time) {
+	public double update(double time) {
 		while (time > 0) {
 			double max = times.get((int) currentIndex);
 			double dt = Math.min(max, time);
@@ -45,6 +45,7 @@ public class FigAnimation {
 		default:
 			currentPose = poses.get(a);
 		}
+		return currentIndex;
 	}
 
 	public String pack() {

@@ -20,9 +20,10 @@ public class Figure {
 		this.pose = fs.defaultPose.clone();
 	}
 
-	public void update(double s) {
-		current_anim.update(s);
-		pose = FigPose.linearMeld(pose, current_anim.getPose(), 0.8);
+	public double update(double s) {
+		double q = current_anim.update(s);
+		pose = FigPose.linearMeld(pose, current_anim.getPose(), 0.4);
+		return q;
 	}
 
 	public void setAnimation(FigAnimation a) {

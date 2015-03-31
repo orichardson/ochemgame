@@ -26,7 +26,7 @@ public class ColorScheme extends HashMap<String, Color> {
 		ColorScheme cs = new ColorScheme();
 
 		Color back = Color.black;
-		Color fore = Color.WHITE;
+//		Color fore = Color.WHITE;
 		Color selected = Methods.colorMeld(new Color(180, 70, 70), new Color(0, 0, 0, 100), prc);
 		Color unselected = Methods.colorMeld(new Color(70, 70, 180), new Color(0, 0, 0, 100), prc);
 
