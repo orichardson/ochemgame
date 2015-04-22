@@ -14,9 +14,11 @@ import java.util.concurrent.locks.ReentrantLock;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import math.Vector3D;
 import utils.Methods;
 import chem.Atom;
 import framework.Eye;
+import framework.TerrainShard;
 import framework.forms.Player;
 
 public class Game extends JPanel implements KeyListener, Runnable {
@@ -53,6 +55,8 @@ public class Game extends JPanel implements KeyListener, Runnable {
 		// Vector3D(-.7,-.7,0)).mult(Matrix.create3DEulerRotMatrix(0, Math.PI/2, 0).expandTo(4)));
 		// c.setTransform(Matrix.create3DAffineTranslateMatrix(new
 		// Vector3D(-.7,.7,0)).mult(Matrix.create3DEulerRotMatrix(0, Math.PI/2, 0).expandTo(4)));
+
+		TerrainShard ts = new TerrainShard(world.current, 30, new Vector3D(), 2, 1);
 
 		setBackground(world.background);
 	}
@@ -117,12 +121,12 @@ public class Game extends JPanel implements KeyListener, Runnable {
 		world.current.draw(g, view);
 
 		// draw fps and other debug information
-		// if (keys.contains(KeyEvent.VK_F1)) {
-		g.setColor(Color.WHITE);
-		g.drawString("[paint fps] " + fps, 20, 40);
-		g.drawString("[min paint] " + minFPS, 20, 60);
-		g.drawString("[update fps] " + updateFPS, 20, 80);
-		// }
+		if (keys.contains(KeyEvent.VK_F1)) {
+			g.setColor(Color.WHITE);
+			g.drawString("[paint fps] " + (int) fps, 20, 40);
+			g.drawString("[min paint] " + (int) minFPS, 20, 60);
+			g.drawString("[update fps] " + (int) updateFPS, 20, 80);
+		}
 	}
 
 	@Override

@@ -20,7 +20,7 @@ public class Player extends ParticleGraphEntity {
 	public Player(SceneNode p) {
 		super(p);
 		this.pos = new Vector3D(0, 0, 0);
-		this.particles = new Particle[3000];
+		this.particles = new TargetParticle[3000];
 
 		this.form = new Form.Duality(this, DotCloud.createCircle(null, 40, new Vector3D(),
 				new Vector3D(0, 0, 1), 1), new Form.Composite(null, DotCloud.createCircle(null, 10,
@@ -37,15 +37,16 @@ public class Player extends ParticleGraphEntity {
 		// 30, new Vector3D(-.75, 0, 0), new Vector3D(0, 0, 1), .45));
 
 		for (int i = 0; i < particles.length; i++) {
-			particles[i] = new Particle(form, Vector3D.random(1));
-			particles[i].fuzz = 0.9;
+			particles[i] = new TargetParticle(form, Vector3D.random(1));
+			particles[i].fuzz = 0.2;
 		}
 
 	}
+	
 	@Override
 	public void update(Game g, double speed) {
 		super.update(g, speed);
-
+		
 		for (int i = 0; i < particles.length; i++)
 			particles[i].update(speed);
 

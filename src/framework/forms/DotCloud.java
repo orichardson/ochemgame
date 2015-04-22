@@ -60,7 +60,7 @@ public class DotCloud extends Form {
 					1 - Math.abs(1 - 2D * i / (n))), dots);
 			dots.dot[i].setNext(new int[]{ (i + 1) % n, (n - 1 + i) % n }, new double[]{ 1, 1 });
 		}
-
+		
 		return dots;
 	}
 

@@ -275,6 +275,15 @@ public class Vector3D {
 		return (a0 * x2 * prc) + a1 * x2 + (p2 - p0) * prc + p1;
 	}
 
+	/*
+	 * The variable that this is estimating is stored in the $z$ component; the x and y are spatial
+	 * coordinates.
+	 */
+	public static Vector3D meldBilin(Vector3D v00, Vector3D v01, Vector3D v10, Vector3D v11,
+			double dx, double dy) {
+		return meld(meld(v00, v01, dx), meld(v10, v11, dx), dy);
+	}
+
 	public static double cub_int(double p1, double p2, double p0, double p3, double d1, double d2,
 			double prc) {
 		double a0, a1, a2, x2, den1, den2, den3, den4, r, s;
@@ -297,4 +306,11 @@ public class Vector3D {
 		return (a0 * x2 * prc) + a1 * x2 + a2 * prc + p1;
 	}
 
+	public double dist2(double x2, double y2) {
+		return (x2 - x) * (x2 - x) + (y2 - y) * (y2 - y);
+	}
+
+	public double dist(Vector3D v) {
+		return Math.sqrt( (v.x - x) * (v.x - x) + (v.y - y) * (v.y - y) + (v.z - z) * (v.z - z));
+	}
 }

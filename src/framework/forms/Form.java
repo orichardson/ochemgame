@@ -17,7 +17,7 @@ public abstract class Form extends SceneNode {
 	}
 
 	public abstract int getSize();
-
+//
 	public abstract int maxSize();
 
 	public abstract Dot getDot(int index);

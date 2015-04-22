@@ -50,7 +50,7 @@ public class PoseCreator extends JPanel implements MouseListener, MouseMotionLis
 
 	HashSet<Integer> selected = new HashSet<Integer>();
 
-	// ******************** Movement and Selection vars* ******
+	// ******************** Movement and Selection vars ********
 
 	FigPose frozen = null;
 	int beginPressX = -1, beginPressY = -1, currMouseX, currMouseY, actualizeX = -1,
@@ -60,8 +60,9 @@ public class PoseCreator extends JPanel implements MouseListener, MouseMotionLis
 	boolean lockX = false, lockY = false, lockZ = false;
 
 	HashSet<Integer> keys;
-	// **************** BUTTON Variables
 	
+	// **************** BUTTON Variables ***********
+	//TODO
 	
 
 	private ReentrantLock lock = new ReentrantLock();

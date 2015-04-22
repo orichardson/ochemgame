@@ -8,7 +8,7 @@ import utils.Methods;
 import framework.SceneNode;
 import framework.forms.DotCloud;
 import framework.forms.Form;
-import framework.forms.Particle;
+import framework.forms.TargetParticle;
 import framework.forms.ParticleGraphEntity;
 
 /*
@@ -51,9 +51,9 @@ public class Atom extends ParticleGraphEntity {
 						100, new Vector3D(),
 						new Vector3D(), 0.1));
 
-		this.particles = new Particle[400];
+		this.particles = new TargetParticle[400];
 		for (int i = 0; i < particles.length; i++) {
-			particles[i] = new Particle(form, Vector3D.random(1));
+			particles[i] = new TargetParticle(form, Vector3D.random(1));
 		}
 
 	}
