@@ -618,4 +618,8 @@ public class Methods {
 		return newA;
 	}
 
+	public static Color colorMeldBiLin(Color c1, Color c2, Color c3, Color c4, double x, double y) {
+		return colorMeld(colorMeld(c1, c2, x), colorMeld(c3, c4, x), y);
+	}
+
 }

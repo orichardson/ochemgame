@@ -38,6 +38,7 @@ public abstract class Particle extends SceneNode {
 				if (v2 != null) {
 					g.setStroke(new BasicStroke(r * 2));
 					g.drawLine((int) v.x, (int) v.y, (int) v2.x, (int) v2.y);
+					g.setStroke(new BasicStroke(1));
 				}
 			}
 		}

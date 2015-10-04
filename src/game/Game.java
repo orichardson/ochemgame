@@ -56,7 +56,7 @@ public class Game extends JPanel implements KeyListener, Runnable {
 		// c.setTransform(Matrix.create3DAffineTranslateMatrix(new
 		// Vector3D(-.7,.7,0)).mult(Matrix.create3DEulerRotMatrix(0, Math.PI/2, 0).expandTo(4)));
 
-		TerrainShard ts = new TerrainShard(world.current, 30, new Vector3D(), 2, 1);
+		new TerrainShard.Grid(world.current, 10, new Vector3D(), 10);
 
 		setBackground(world.background);
 	}

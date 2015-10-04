@@ -256,12 +256,12 @@ public class Vector3D {
 		return new Matrix(new double[][]{ { 0, -z, y }, { z, 0, -x }, { -y, x, 0 } });
 	}
 
-	public static Vector3D meldCubic(Vector3D v1, Vector3D v2, Vector3D v0, Vector3D v3, double prc) {
+	public static Vector3D meldCubic(Vector3D v0, Vector3D v1, Vector3D v2, Vector3D v3, double prc) {
 		return new Vector3D(cub_int(v1.x, v2.x, v0.x, v3.x, prc), cub_int(v1.y, v2.y, v0.y, v3.y,
 				prc), cub_int(v1.z, v2.z, v0.z, v3.z, prc));
 	}
 
-	public static Vector3D meldCubic(Vector3D v1, Vector3D v2, Vector3D v0, Vector3D v3, double d1,
+	public static Vector3D meldCubic(Vector3D v0, Vector3D v1, Vector3D v2, Vector3D v3, double d1,
 			double d2, double prc) {
 		return new Vector3D(cub_int(v1.x, v2.x, v0.x, v3.x, d1, d2, prc), cub_int(v1.y, v2.y, v0.y,
 				v3.y, d1, d2, prc), cub_int(v1.z, v2.z, v0.z, v3.z, d1, d2, prc));
@@ -279,9 +279,21 @@ public class Vector3D {
 	 * The variable that this is estimating is stored in the $z$ component; the x and y are spatial
 	 * coordinates.
 	 */
-	public static Vector3D meldBilin(Vector3D v00, Vector3D v01, Vector3D v10, Vector3D v11,
+	public static Vector3D meldBiLin(Vector3D v00, Vector3D v01, Vector3D v10, Vector3D v11,
 			double dx, double dy) {
 		return meld(meld(v00, v01, dx), meld(v10, v11, dx), dy);
+	}
+
+	public static Vector3D meldBiCub(Vector3D[][] v, double dx, double dy) {
+		return meldCubic(
+				// Thing comment
+				meldCubic(v[0][0], v[0][1], v[0][2], v[0][3], dy),
+				meldCubic(v[1][0], v[1][1], v[1][2], v[1][3], dy),
+				meldCubic(v[2][0], v[2][1], v[2][2], v[2][3], dy),
+				meldCubic(v[3][0], v[3][1], v[3][2], v[3][3], dy), dx);
+			
+//		return meldBiLin(v[1][1], v[1][2], v[2][1], v[2][2], dy, dx);
+		//return meldCubic(v[1][0],v[1][1],v[1][2], v[1][3],dx);
 	}
 
 	public static double cub_int(double p1, double p2, double p0, double p3, double d1, double d2,
@@ -313,4 +325,20 @@ public class Vector3D {
 	public double dist(Vector3D v) {
 		return Math.sqrt( (v.x - x) * (v.x - x) + (v.y - y) * (v.y - y) + (v.z - z) * (v.z - z));
 	}
+
+	// public static void main(String[] args) {
+	// double[] pts = new double[10];
+	// for (int i = 0; i < 10; i++)
+	// pts[i] = Math.random() * 100;
+	//
+	// for (double j = 0; j < 10; j += 0.01) {
+	// double x =cub_int(pts[(int) j], pts[(int) (j + 1) % 10], pts[(int) (j + 10 - 1) % 10],
+	// pts[(int) (j + 2) % 10], j % 1);
+	//
+	// for(int i = 0; i <x; i++)
+	// System.out.print("*");
+	//
+	// System.out.print("\n");
+	// }
+	// }
 }

@@ -5,118 +5,145 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.util.Collection;
 
-import math.Vector3D;
-import utils.Methods;
 import framework.forms.Particle;
 import game.Game;
+import math.Vector3D;
+import utils.Methods;
 
 /*
  * Each represents a pair of triangles
  */
-public class TerrainShard extends SceneNode {
+public abstract class TerrainShard extends SceneNode {
 
-	public static int[] DX = { 0, 1, 1, 1, 0, -1, -1, -1 };
-	public static int[] DY = { -1, -1, 0, 1, 1, 1, 0, -1 };
+	protected TerrainShard(SceneNode p) {
+		super(p);
+	}
 
-	TerrainShard[][] tiles;
-	GridPoint[][] points;
-	private int N;
+	public abstract double findZ(double x, double y);
+	public abstract Color findC(double x, double y);
 
-	int type;
-	GridPoint v1, v2, v3, v4;
-	Vector3D normal;
-	double length;
+	public static class Tile extends TerrainShard {
+		GridPoint v1, v2, v3, v4;
 
-	public TerrainShard(SceneNode sn, int n, Vector3D center, double side) {
-		super(sn);
-		this.N = n;
-		this.length = side / 2;
+		// arranged as follows:
+		// (1) (2)
+		// (3) (4)
 
-		this.v1 = new GridPoint(center).add(-length, -length, 0);
-		this.v2 = new GridPoint(center).add(length, -length, 0);
-		this.v3 = new GridPoint(center).add(length, length, 0);
-		this.v4 = new GridPoint(center).add(-length, length, 0);
+		protected Tile(SceneNode p, GridPoint v1, GridPoint v2, GridPoint v3, GridPoint v4) {
+			super(p);
 
-		Vector3D X = new Vector3D(side, 0, 0), Y = new Vector3D(0, side, 0);
+			this.v1 = v1;
+			this.v2 = v2;
+			this.v3 = v3;
+			this.v4 = v4;
+		}
 
-		if (N > 1) {
+		@Override
+		public double findZ(double x, double y) {
+			return Vector3D.meldBiLin(v1, v2, v3, v4, (x - v1.x) / (v2.x - v1.x), (y - v1.y)
+					/ (v3.y - v1.y)).z;
+			// Vector3D[][] v = new Vector3D[][]{{v4,v1,
+			// v2,v3},{v4,v1,v2,v3},{v1,v3,v4,v2},{v1,v3,v4,v2}};
+			// return Vector3D.meldBiCub(v, (x - v1.x)
+			// / (v2.x - v1.x), (y - v1.y) / (v3.y - v1.y)).z;
+		}
+
+		@Override
+		public Color findC(double x, double y) {
+			return Methods.colorMeldBiLin(v1.color, v2.color, v3.color, v4.color, (x - v1.x)
+					/ (v2.x - v1.x), (y - v1.y) / (v3.y - v1.y));
+		}
+	}
+
+	public static class Grid extends TerrainShard {
+		TerrainShard[][] tiles;
+		GridPoint[][] points;
+		private int N;
+		Vector3D center;
+		private boolean smooth = true;
+
+		int type;
+
+		double length;
+
+		public Grid(SceneNode sn, int n, Vector3D center, double side) {
+			super(sn);
+			this.N = n;
+			this.length = side;
+			this.center = center;
+
 			tiles = new TerrainShard[n][n];
-			points = new GridPoint[n+1][n+1];
-			
+			points = new GridPoint[n + 1][n + 1];
+
 			for (int i = 0; i <= n; i++)
 				for (int j = 0; j <= n; j++) {
-					points[i][j] = new GridPoint();
+					points[i][j] = new GridPoint(center).add(side * (i - n / 2) / n, side
+							* (j - n / 2) / n, -Math.random() * 2);
+					points[i][j].color = Methods.randomColor();
 				}
-			
+
 			for (int i = 0; i < n; i++)
 				for (int j = 0; j < n; j++) {
-					tiles[i][j] = new TerrainShard(this, );
+					tiles[i][j] = new Tile(this, points[i][j], points[i + 1][j], points[i][j + 1],
+							points[i + 1][j + 1]);
 				}
 		}
-	}
-	public TerrainShard(SceneNode n, GridPoint v1, GridPoint v2, GridPoint v3, GridPoint v4) {
-		super(n);
-	}
 
-	public TerrainShard(SceneNode n, Collection<GridPoint> list) {
-		super(n);
-		
-		list.
-	}
-	public double findZ(double x, double y) {
-		if (N <= 1) {
-			return center.z;
+		public Grid(SceneNode n, Collection<GridPoint> list) {
+			super(n);
+
+			// list.
 		}
 
-		int xind = (int) (N * (radius + x - center.x) / (2 * radius));
-		int yind = (int) (N * (radius + y - center.y) / (2 * radius));
+		@Override
+		public double findZ(double x, double y) {
+			int xind = (int) Methods.bound(N * (x - points[0][0].x) / (length), 0, N - 1);
+			int yind = (int) Methods.bound(N * (y - points[0][0].y) / (length), 0, N - 1);
 
-		xind = (int) Methods.bound(xind, 0, N - 1);
-		yind = (int) Methods.bound(yind, 0, N - 1);
+			if (!smooth || tiles[xind][yind] instanceof Grid)
+				return tiles[xind][yind].findZ(x, y);
 
-		double estimate = 0;
-		// double init = tiles[xind][yind].findZ(x, y);
-		double weight = 0;
+			// bicubic intepolation?
+			Vector3D[][] v = new Vector3D[4][4];
+			for (int i = -1; i <= 2; i++)
+				for (int j = -1; j <= 2; j++)
+					v[i + 1][j + 1] = points[ (xind + i + N) % N][ (yind + j + N) % N];
 
-		for (int i = -1; i <= 1; i++)
-			for (int j = -1; j <= 1; j++) {
-				if (xind + i < 0 || xind + i >= N || yind + j < 0 || yind + j >= N)
-					continue;
-				TerrainShard t = tiles[xind + i][yind + j];
+			return Vector3D.meldBiCub(v, (x - v[1][1].x) / (v[2][1].x - v[1][1].x), (y - v[1][1].y)
+					/ (v[1][2].y - v[1][1].y)).z;
 
-				double dist = t.center.dist2(x, y);
-				double w = 1 / ( (dist * dist * dist));
-				estimate += t.center.z * w;
-				weight += w;
-			}
-		estimate /= weight;
-		// estimate += init;
+		}
 
-		return estimate;
-		// return init;
-	}
+		@Override
+		public Color findC(double x, double y) {
+			int xind = (int) Methods.bound(N * (x - points[0][0].x) / (length), 0, N - 1);
+			int yind = (int) Methods.bound(N * (y - points[0][0].y) / (length), 0, N - 1);
 
-	@Override
-	public void draw(Graphics2D g, Eye e) {
-		// super.draw(g, e);
+			return tiles[xind][yind].findC(x, y);
+		}
 
-		double NPTS = 200 * radius;
-		for (double i = -1; i < 1; i += 2d / NPTS)
-			for (double j = -1; j < 1; j += 2d / NPTS) {
-				Vector3D v = new Vector3D(center.x + i * radius, center.y + j * radius, 0);
-				v.z = findZ(v.x, v.y);
+		@Override
+		public void draw(Graphics2D g, Eye e) {
+			super.draw(g, e);
 
-				Vector3D scr = e.toScreenDepthBufferUpdate(v, 5);
-				if (scr != null) {
-					int r = (int) scr.z;
-					g.setColor(Methods.randomColor((int) (radius * 109 + i * radius + j * radius),
-							255));
-					g.fillRect((int) scr.x - r, (int) scr.y - r, (r * 2 + 1), (r * 2 + 1));
+			double NPTS = 20 * length;
+			for (double i = -1; i < 1; i += 2d / NPTS) {
+
+				for (double j = -1; j < 1; j += 2d / NPTS) {
+					Vector3D v = new Vector3D(center.x + i * length / 2, center.y + j * length / 2,
+							0);
+					v.z = findZ(v.x, v.y);
+
+					Vector3D scr = e.toScreenDepthBufferUpdate(v, 5);
+					if (scr != null) {
+						int r = (int) scr.z;
+						g.setColor(findC(v.x, v.y));
+						g.fillRect((int) scr.x - r, (int) scr.y - r, (r * 2 + 1), (r * 2 + 1));
+					}
 				}
-			}
-	}
 
-	public void deapen(int branchSize) {
+			}
+		}
 
 	}
 
