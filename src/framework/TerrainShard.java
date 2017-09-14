@@ -126,7 +126,7 @@ public abstract class TerrainShard extends SceneNode {
 		public void draw(Graphics2D g, Eye e) {
 			super.draw(g, e);
 
-			double NPTS = 20 * length;
+			double NPTS = 15 * length;
 			for (double i = -1; i < 1; i += 2d / NPTS) {
 
 				for (double j = -1; j < 1; j += 2d / NPTS) {

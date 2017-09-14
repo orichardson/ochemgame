@@ -14,12 +14,13 @@ import java.util.concurrent.locks.ReentrantLock;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import math.Vector3D;
-import utils.Methods;
 import chem.Atom;
 import framework.Eye;
 import framework.TerrainShard;
 import framework.forms.Player;
+import math.Matrix;
+import math.Vector3D;
+import utils.Methods;
 
 public class Game extends JPanel implements KeyListener, Runnable {
 	// public static Dimension SCREEN = new Dimension(700,400);
@@ -46,15 +47,14 @@ public class Game extends JPanel implements KeyListener, Runnable {
 		player = new Player(world.current);
 
 		new Atom(world.current, 20);
-		// Atom b = new Atom(world.current, 32);
-		// Atom c = new Atom(world.current, 31);
+		 Atom b = new Atom(world.current, 32);
+		 Atom c = new Atom(world.current, 31);
 
-		// a.setTransform(Matrix.create3DAffineTranslateMatrix(new
-		// Vector3D(1,0,0)).mult(Matrix.create3DEulerRotMatrix(0, Math.PI/2, 0).expandTo(4)));
-		// b.setTransform(Matrix.create3DAffineTranslateMatrix(new
-		// Vector3D(-.7,-.7,0)).mult(Matrix.create3DEulerRotMatrix(0, Math.PI/2, 0).expandTo(4)));
-		// c.setTransform(Matrix.create3DAffineTranslateMatrix(new
-		// Vector3D(-.7,.7,0)).mult(Matrix.create3DEulerRotMatrix(0, Math.PI/2, 0).expandTo(4)));
+//		a.setTransform(Matrix.create3DAffineTranslateMatrix(new Vector3D(1, 0, 0))
+//				.mult(Matrix.create3DEulerRotMatrix(0, Math.PI / 2, 0).expandTo(4)));
+		b.setTransform(Matrix.create3DAffineTranslateMatrix(new Vector3D(-.7, -.7, 0))
+				.mult(Matrix.create3DEulerRotMatrix(0, Math.PI / 2, 0).expandTo(4)));
+		c.setTransform(Matrix.create3DAffineTranslateMatrix(new Vector3D(-.7,.7,0)).mult(Matrix.create3DEulerRotMatrix(0, Math.PI/2, 0).expandTo(4)));
 
 		new TerrainShard.Grid(world.current, 10, new Vector3D(), 10);
 
@@ -110,7 +110,7 @@ public class Game extends JPanel implements KeyListener, Runnable {
 
 		Graphics2D g = (Graphics2D) grr;
 
-		int trans = (int) (255 * 60 / (60 + fps));
+		int trans = (int) (255 * 10 / (10 + fps));
 		g.setColor(Methods.getColor(world.background, trans));
 		g.fill(g.getClip());
 
